@@ -8,25 +8,17 @@ const app = express();
 
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://my-time-hazel.vercel.app'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 };
 
 app.use(cors(corsOptions));
-
-// Explicitly handle OPTIONS requests before your routes
-app.options('*', cors(corsOptions));
 
 app.use(express.json());
 require("dotenv").config();
 
 const path = require('path');
 
-const serviceAccount = path.join(__dirname, 'firebaseadmin/serviceAccountKey.json');
-firebaseAdmin.initializeApp({
-  credential: firebaseAdmin.credential.cert(require(serviceAccount)),
-});
+
 
 
 mongoose.connect(process.env.MONGO_URI)
@@ -35,6 +27,14 @@ mongoose.connect(process.env.MONGO_URI)
 })
 .catch((err) => {
     console.log('Not connected to MongoDB.', err);
+});
+
+const firebaseAdminKey = JSON.parse(
+  Buffer.from(process.env.FIREBASE_ADMIN_KEY, 'base64').toString('utf8')
+);
+
+firebaseAdmin.initializeApp({
+  credential: firebaseAdmin.credential.cert(firebaseAdminKey),
 });
 
 // Handle Google Sign-In Token Verification
