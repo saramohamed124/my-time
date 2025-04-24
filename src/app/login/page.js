@@ -33,7 +33,7 @@ export default function LoginPage() {
         // You can perform additional actions like storing user data in context, etc.
       }
     } catch (error) {
-      setError('Login failed, please try again.');
+      setError('فشل تسجيل الدخول');
     }
   };
 
