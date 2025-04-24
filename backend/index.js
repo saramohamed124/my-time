@@ -16,7 +16,7 @@ require("dotenv").config();
 
 const path = require('path');
 
-const serviceAccount = path.join(__dirname, 'firebaseAdmin/serviceAccountKey.json');
+const serviceAccount = path.join(__dirname, 'firebaseadmin/serviceAccountKey.json');
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(require(serviceAccount)),
 });
