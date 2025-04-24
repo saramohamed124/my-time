@@ -6,10 +6,17 @@ const bcrypt = require('bcrypt');
 const Users = require('./models/Users');
 const app = express();
 
-app.use(cors({
-    origin: ['http://localhost:3000' , 'https://my-time-hazel.vercel.app'],
-    credentials: true
-}));
+const corsOptions = {
+  origin: ['http://localhost:3000', 'https://my-time-hazel.vercel.app'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+
+// Explicitly handle OPTIONS requests before your routes
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 require("dotenv").config();
