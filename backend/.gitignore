@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/firebaseAdmin
 /.pnp
 .pnp.*
 .yarn/*
