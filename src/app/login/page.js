@@ -1,15 +1,13 @@
 'use client';
 
 import { useState } from "react";
-import GoogleLoginButton from "./components/GoogleProvider";
 import task from '@/app/assets/imgs/taskauth.png';
 import Image from "next/image";
 import Link from "next/link";
+import GoogleLoginButton from "../signup/components/GoogleProvider";
 
-export default function SignupForm() {
+export default function LoginPage() {
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
     email: '',
     password: '',
   });
@@ -24,58 +22,36 @@ export default function SignupForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/signup`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
       const data = await res.json();
-      setMessage(data.message || 'Signup complete!');
+      setMessage(data.message || 'Login complete!');
     } catch (err) {
-      setMessage('فشل إنشاء حساب');
+        console.log(err);
+        
+      setMessage('فشل تسجيل الدخول');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-        <article className="container w-full grid grid-cols-1 md:grid-cols-2 justify-center items-center my-0 md:my-10 mx-auto">
+        <article className="container w-full grid grid-cols-1 md:grid-cols-2 justify-center h-full items-center my-0 md:my-4 mx-auto">
           <header className="flex flex-col justify-between h-full">
             <section className="flex items-center">
             <img src='/favicon.png'/>
-            <Link href='/' className='text-[#535FFD] text-2xl font-bold'>وقتي</Link>
+          <Link href='/' className='text-[#535FFD] text-2xl font-bold'>وقتي</Link>
             </section>
           <Image className="max-w-full" src={task} alt="task" />
           </header>
-      <main className="mx-0 p-6 bg-[#1D2159] text-white shadow-lg rounded-none md:rounded  space-y-6 mb-0">
+      <main className="h-full mx-0 p-6 bg-[#1D2159] text-white shadow-lg rounded-none md:rounded  space-y-6 mb-0">
         <h2 className="text-2xl font-bold text-center">جاهز تنجز مهامك بسهولة؟</h2>
         <p className="text-sm text-center">أنشئ حسابك الآن وابدأ رحلتك نحو إنتاجية أعلى.</p>
-        <form onSubmit={handleSubmit} className="space-y-4 ">
-          <section>
-            <label htmlFor="firstName" className="block text-sm mb-1">الاسم الأول</label>
-            <input
-              id="firstName"
-              name="firstName"
-              placeholder="الاسم الأول"
-              className="w-full border p-2 rounded text-black"
-              onChange={handleChange}
-              required
-            />
-          </section>
-
-          <section>
-            <label htmlFor="lastName" className="block text-sm mb-1">اسم العائلة</label>
-            <input
-              id="lastName"
-              name="lastName"
-              placeholder="اسم العائلة"
-              className="w-full border p-2 rounded text-black"
-              onChange={handleChange}
-              required
-            />
-          </section>
-
+        <form onSubmit={handleSubmit} className="space-y-4">
           <section>
             <label htmlFor="email" className="block text-sm mb-1">البريد الإلكتروني</label>
             <input
@@ -106,7 +82,7 @@ export default function SignupForm() {
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
           >
-            {loading ? 'جاري التسجيل...' : 'إنشاء حساب'}
+            {loading ? 'جاري التسجيل...' : 'تسجيل الدخول'}
           </button>
         </form>
 
@@ -116,8 +92,8 @@ export default function SignupForm() {
           <GoogleLoginButton />
         </section>
         <footer className="flex justify-center w-full">
-          <p>لديك حساب بالفعل؟</p>
-          <Link className="text-blue-700 px-1" href='/login'>تسجيل الدخول</Link>
+          <p>ليس لديك حساب ؟</p>
+          <Link className="text-blue-700 px-1" href='/signup'>إنشاء حساب</Link>
         </footer>
       </main>
     </article>

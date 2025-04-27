@@ -48,8 +48,8 @@ const UserSchema = new Schema({
         trim: true,
         validate: {
             validator: (v) => {
-                if (!v) return true; // ✅ Skip validation if password is not provided
-                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{7,24}$/.test(v);
+                if (!v) return true;
+                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]){7,24}/.test(v);
             },
             message: props => `${props.value} is not a valid password. It should contain at least one lowercase letter, one uppercase letter, one number, one special character, and be between 7 and 24 characters long.`,
         }

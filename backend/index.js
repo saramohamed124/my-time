@@ -66,6 +66,7 @@ app.post('/auth/google', async (req, res) => {
           specialty_id: null,
         });
         await user.save();
+        
         return res.status(201).json({ message: 'User created successfully', user });
       }
   
@@ -95,7 +96,7 @@ app.post('/auth/signup', async (req, res) => {
         firstName,
         lastName,
         email,
-        hashedPassword,
+        password: hashedPassword,
         role: 'Student',
         specialty_id: null,
       });
@@ -107,6 +108,47 @@ app.post('/auth/signup', async (req, res) => {
       res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
+// Login 
+app.post('/auth/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  // Validate inputs
+  if (!email || !password) {
+    return res.status(400).json({ message: 'البريد الإلكتروني وكلمة المرور مطلوبة.' });
+  }
+
+  try {
+    // Find user by email
+    const user = await Users.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'المستخدم غير موجود.' });
+    }
+
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: 'كلمة المرور غير صحيحة.' });
+    }
+
+    // Success: return basic user info (without sensitive data)
+    res.status(200).json({
+      message: 'تم تسجيل الدخول بنجاح!',
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      }
+    });
+
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'حدث خطأ في الخادم.' });
+  }
+});
+
 
 // Start the server
 app.listen(process.env.PORT, () => {

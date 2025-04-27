@@ -8,7 +8,7 @@ export default function Home() {
   return (
    <main>
     <Navbar />
-    <article className="bg-[#CACDFE]  mx-0">
+    <article className="bg-[linear-gradient(to_bottom,_#CACDFE_15%,_#cacdfe82_55%,_#cacdfe2b_65%)] mx-0">
       <section className="text-center p-8 flex justify-center flex-col items-center gap-2">
         <h1 className="text-3xl text-black font-bold mb-4 w-[90%] md:w-[24rem]">إدارة احترافية للمهام والوقت، بين يديك</h1>
         <p className="text-[#757575] w-[90%] md:w-2xl">
@@ -16,7 +16,7 @@ export default function Home() {
       <Link className="bg-[#535FFD] text-white text-2xl px-8 py-2 rounded my-4" href='/signup'>ابدأ الآن</Link>
       </section>
       
-      <div className="relative w-full md:w-[70%] mx-auto">
+      <section className="relative w-full md:w-[70%] mx-auto">
         <Image 
           src={header} 
           alt="home" 
@@ -25,7 +25,7 @@ export default function Home() {
           height={600}
           className="object-cover"
         />
-      </div>
+      </section>
       <Tools/>
     </article>
    </main>
