@@ -7,4 +7,4 @@ const Jobs = () => {
   )
 }
 
-export default page
+export default Jobs
