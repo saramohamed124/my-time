@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-    setLoading(false);
+    setLoading(false);    
   }, []);
 
   const login = async (userData) => {

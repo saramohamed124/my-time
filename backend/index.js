@@ -154,27 +154,35 @@ app.post('/auth/login', async (req, res) => {
 
 
 // CREATE a new task with level
-// CREATE a new task with level
-app.post('/todos', async (req, res) => {
-  const { title, description, type, level } = req.body;
 
-  if (!title || !description || !type || !level) {
+
+// GET all tasks
+// CREATE a new task with userId (user-specific)
+app.post('/todos', async (req, res) => {
+  const { title, description, type, level, userId } = req.body;
+
+  if (!title || !description || !type || !level || !userId) {
     return res.status(400).json({ message: 'الرجاء ملء جميع الحقول المطلوبة' });
   }
 
   try {
-    const todo = new Todo({ title, description, type, level });
+    const todo = new Todo({
+      title,
+      description,
+      type,
+      level,
+      userId,  // Associate the task with the user
+    });
     await todo.save();
     res.status(201).json({ message: 'تم إنشاء المهمة بنجاح', todo });
   } catch (err) {
     res.status(500).json({ message: 'خطأ أثناء إنشاء المهمة', error: err.message });
   }
 });
-
-// GET all tasks
-app.get('/todos', async (req, res) => {
+// GET tasks by user ID
+app.get('/todos/user/:userId', async (req, res) => {
   try {
-    const todos = await Todo.find();
+    const todos = await Todo.find({ userId: req.params.userId }); // Filter by userId
     res.status(200).json(todos);
   } catch (err) {
     res.status(500).json({ message: 'خطأ أثناء جلب المهام', error: err.message });

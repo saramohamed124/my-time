@@ -1,10 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// Fetch all todos
-export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}todos`); // Replace with your API
-  return response.json();
+export const fetchTodos = createAsyncThunk('todos/fetchTodos', async (userId) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}todos/user/${userId}`);
+  if (!response.ok) {
+    throw new Error('حدث خطأ أثناء تحميل المهام.');
+  }
+  return await response.json();
 });
+
 
 // Add a new Todo
 export const addTodoAsync = createAsyncThunk('todos/addTodo', async (todoData) => {

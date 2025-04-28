@@ -32,6 +32,11 @@ const todoSchema = new mongoose.Schema({
     type: String,
     enum: ['beginner', 'intermediate', 'advanced'], // Restrict values to these options
     required: true // Make sure this field is provided
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Reference to the User model
+    required: true,
   }
 });
 

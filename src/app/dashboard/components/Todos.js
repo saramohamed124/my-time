@@ -12,6 +12,7 @@ const Todos = () => {
   const dispatch = useDispatch();
   const { todos, status, error } = useSelector((state) => state.todos);
 
+  const [userId, setUserId] = useState(null); // بدل user
   const [newTodo, setNewTodo] = useState({
     title: '',
     description: '',
@@ -24,17 +25,26 @@ const Todos = () => {
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchTodos());
+    // نتحقق أولاً أننا في المتصفح
+    if (typeof window !== 'undefined') {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user && user.id) {
+        setUserId(user.id);
+      }
     }
-  }, [status, dispatch]);
+  }, []);
+
+  useEffect(() => {
+    if (status === 'idle' && userId) {
+      dispatch(fetchTodos(userId));
+    }
+  }, [status, dispatch, userId]);
 
   const handleAddTodo = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(addTodoAsync(newTodo)).unwrap();
+      await dispatch(addTodoAsync({ ...newTodo, userId })).unwrap();
       setNewTodo({ title: '', description: '', type: '', level: '' });
-    dispatch(fetchTodos());
       setShowModal(false);
       setFormError('');
     } catch (err) {
@@ -47,7 +57,7 @@ const Todos = () => {
     try {
       await dispatch(editTodoAsync(editingTodo)).unwrap();
       setEditingTodo(null);
-      dispatch(fetchTodos());
+      dispatch(fetchTodos(userId));
       setShowModal(false);
       setFormError('');
     } catch (err) {
@@ -57,7 +67,7 @@ const Todos = () => {
 
   const handleDeleteTodo = async (id) => {
     await dispatch(deleteTodoAsync(id));
-    dispatch(fetchTodos());
+    dispatch(fetchTodos(userId));
   };
 
   const openAddModal = () => {
@@ -76,7 +86,7 @@ const Todos = () => {
   return (
     <article className="p-6">
       {/* Header */}
-      <section className='flex flex-wrap w-full justify-between my-3 gap-2'>
+      <section className="flex flex-wrap w-full justify-between my-3 gap-2">
         <h1 className="text-3xl font-semibold text-center">قائمة المهام</h1>
         <div className="text-center">
           <button
@@ -93,7 +103,7 @@ const Todos = () => {
       {status === 'failed' && <p className="text-center text-red-500">خطأ: {error}</p>}
 
       {/* Tasks List */}
-      {status === 'succeeded' && (
+      {status === 'succeeded' && todos.length !== 0 && todos ? (
         <ul className="space-y-4">
           {todos.map((todo) => (
             <li key={todo._id} className="bg-white p-4 rounded-lg shadow-md hover:bg-gray-100 transition-all">
@@ -118,6 +128,8 @@ const Todos = () => {
             </li>
           ))}
         </ul>
+      ): (
+        <p className='text-2xl text-gray-500'>لا توجد مهام بعد.أضف مهام.</p>
       )}
 
       {/* Modal */}
@@ -161,7 +173,7 @@ const Todos = () => {
               <div>
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">وصف المهمة</label>
                 <textarea
-                required
+                  required
                   id="description"
                   value={editingTodo ? editingTodo.description : newTodo.description}
                   onChange={(e) =>
