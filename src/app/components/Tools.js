@@ -7,6 +7,7 @@ import tailwindcss from '@/app/assets/icons/tailwindcss.svg'
 import js from '@/app/assets/icons/js.svg'
 import reactjs from '@/app/assets/icons/reactjs.svg'
 import next from '@/app/assets/icons/next.svg'
+import redux from '@/app/assets/icons/redux.svg'
 import firebase from '@/app/assets/icons/firebase.svg'
 import nodejs from '@/app/assets/icons/nodejs.svg'
 import mongodb from '@/app/assets/icons/mongodb.svg'
@@ -62,6 +63,10 @@ export default function Tools() {
         {
             id: 11,
             icon: npm,
+        },
+        {
+            id: 12,
+            icon: redux,
         },
     ];
     return(

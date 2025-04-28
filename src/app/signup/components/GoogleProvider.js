@@ -7,13 +7,17 @@ import { Fragment, useState } from "react";
 // icon
 import google from '@/app/assets/icons/google.svg'
 import Image from "next/image";
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function GoogleLoginButton() {
+    const { login } = useAuth();
+  
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
 
 
   const handleGoogleLogin = async () => {
+    try{
     const provider = new GoogleAuthProvider();
     
   
@@ -21,13 +25,22 @@ export default function GoogleLoginButton() {
     const token = await result.user.getIdToken();
   
     // Send token to backend
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/google`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/google`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({ idToken: token })
     });
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "حدث خطأ أثناء تسجيل الدخول.");
+      }
+
+      await login(data.user);  }catch(err){
+    alert("حدث خطأ في الخادم. حاول لاحقاً");
+  }
   };
     return (
     <Fragment>

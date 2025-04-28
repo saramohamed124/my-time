@@ -9,7 +9,7 @@ const UserSchema = new Schema({
         validate: {
             validator: (v) => {
                 // Allow Arabic or Latin characters with at least 3 characters
-                return /^[\u0600-\u06FF\s]{3,}$|^[a-zA-Z\s]{3,}$/.test(v);
+                return /^[\u0600-\u06FF\s]{4,}|[a-zA-Z ]{4,}$/.test(v);
             },
             message: props => `${props.value} is not a valid first name. It should be at least 3 characters long and contain only letters and spaces.`,
         }
@@ -20,8 +20,7 @@ const UserSchema = new Schema({
         trim: true,
         validate: {
             validator: (v) => {
-                // Allow Arabic or Latin characters with at least 3 characters
-                return /^[\u0600-\u06FF\s]{3,}$|^[a-zA-Z\s]{3,}$/.test(v);
+                return /^[\u0600-\u06FF\s]{4,}|[a-zA-Z ]{4,}$/.test(v);
             },
             message: props => `${props.value} is not a valid last name. It should be at least 3 characters long and contain only letters and spaces.`,
         }
@@ -37,7 +36,7 @@ const UserSchema = new Schema({
         validate: {
             // Match valid Gmail addresses with optional domains (.com, .co, .net)
             validator: (v) => {
-                return /^[a-zA-Z0-9._%+-]+@gmail\.(com|co|net)$/.test(v);
+                return /^[a-zA-Z0-9._%+-]+@gmail+\.com|co|net{2,}$/.test(v);
             },
             message: props => `${props.value} is not a valid email address. Only Gmail accounts are allowed.`,
         }

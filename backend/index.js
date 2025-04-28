@@ -5,6 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const Users = require('./models/Users');
 const app = express();
+const Todo = require('./models/Todo');
 
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://my-time-hazel.vercel.app'],
@@ -104,6 +105,8 @@ app.post('/auth/signup', async (req, res) => {
       await newUser.save();
       res.status(201).json({ message: 'User signed up successfully!', user: newUser });
     } catch (err) {
+      console.log(err);
+      
       console.error('Signup error:', err);
       res.status(500).json({ message: 'Internal Server Error' });
     }
@@ -127,8 +130,8 @@ app.post('/auth/login', async (req, res) => {
 
     // Compare passwords
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'كلمة المرور غير صحيحة.' });
+    if (!isPasswordValid ) {
+      return res.status(401).json({ message: 'اسم المستخدم أو كلمة المرور غير صحيحة.' });
     }
 
     // Success: return basic user info (without sensitive data)
@@ -148,6 +151,86 @@ app.post('/auth/login', async (req, res) => {
     res.status(500).json({ message: 'حدث خطأ في الخادم.' });
   }
 });
+
+
+// CREATE a new task with level
+// CREATE a new task with level
+app.post('/todos', async (req, res) => {
+  const { title, description, type, level } = req.body;
+
+  if (!title || !description || !type || !level) {
+    return res.status(400).json({ message: 'الرجاء ملء جميع الحقول المطلوبة' });
+  }
+
+  try {
+    const todo = new Todo({ title, description, type, level });
+    await todo.save();
+    res.status(201).json({ message: 'تم إنشاء المهمة بنجاح', todo });
+  } catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء إنشاء المهمة', error: err.message });
+  }
+});
+
+// GET all tasks
+app.get('/todos', async (req, res) => {
+  try {
+    const todos = await Todo.find();
+    res.status(200).json(todos);
+  } catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء جلب المهام', error: err.message });
+  }
+});
+
+// GET task by ID
+app.get('/todos/:id', async (req, res) => {
+  try {
+    const todo = await Todo.findById(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ message: 'المهمة غير موجودة' });
+    }
+    res.status(200).json(todo);
+  } catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء جلب المهمة', error: err.message });
+  }
+});
+
+// UPDATE a task with level
+app.put('/todos/:id', async (req, res) => {
+  const { title, description, type, level, completed } = req.body;
+
+  if (!title || !description || !type || !level) {
+    return res.status(400).json({ message: 'الرجاء ملء جميع الحقول المطلوبة' });
+  }
+
+  try {
+    const todo = await Todo.findByIdAndUpdate(
+      req.params.id,
+      { title, description, type, level, completed },
+      { new: true }
+    );
+
+    if (!todo) {
+      return res.status(404).json({ message: 'المهمة غير موجودة' });
+    }
+    res.status(200).json({ message: 'تم تحديث المهمة بنجاح', todo });
+  } catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء تحديث المهمة', error: err.message });
+  }
+});
+
+// DELETE a task
+app.delete('/todos/:id', async (req, res) => {
+  try {
+    const todo = await Todo.findByIdAndDelete(req.params.id);
+    if (!todo) {
+      return res.status(404).json({ message: 'المهمة غير موجودة' });
+    }
+    res.status(200).json({ message: 'تم حذف المهمة بنجاح' });
+  } catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء حذف المهمة', error: err.message });
+  }
+});
+
 
 
 // Start the server
