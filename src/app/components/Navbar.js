@@ -6,13 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 const Navbar = () => {
-  const router = useRouter()
   const { user, loading } = useAuth();
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/login'); // Redirect if not authenticated
-    }
-  }, [user, loading, router]);
 
   if (loading) return <p>Loading...</p>;
 
