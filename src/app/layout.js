@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
     <Provider store={store}>  {/* Wrap the entire app with Redux provider */}
     <html lang="ar" dir="rtl">
       <head>
-        <link rel="icon" href='/favicon.png' type="image/svg+xml" />
+        <link rel="icon" href='/favicon.png' type="image/png" />
         <title>{metadata.title}</title>
       </head>
       <body className={`${robotoSans.variable} ${robotoMono.variable} antialiased`}>
