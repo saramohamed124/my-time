@@ -1,8 +1,8 @@
-'use client'; // أضف هذا السطر في البداية
+'use client';
 
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { addTodo } from '@/lib/features/todos/todoSlice'; // استيراد العمل
+import { addTodo } from '@/lib/features/todos/todoSlice'; 
 
 const AddTodo = () => {
   const [title, setTitle] = useState('');
@@ -12,7 +12,6 @@ const AddTodo = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // إنشاء مهمة جديدة
     const newTodo = {
       title,
       description,
@@ -20,10 +19,8 @@ const AddTodo = () => {
       type: 'task',
     };
 
-    // إرسال العمل لإضافة المهمة الجديدة
     dispatch(addTodo(newTodo));
 
-    // مسح الحقول بعد الإرسال
     setTitle('');
     setDescription('');
   };

@@ -8,7 +8,6 @@ const UserSchema = new Schema({
         trim: true,
         validate: {
             validator: (v) => {
-                // Allow Arabic or Latin characters with at least 3 characters
                 return /^[\u0600-\u06FF\s]{4,}|[a-zA-Z ]{4,}$/.test(v);
             },
             message: props => `${props.value} is not a valid first name. It should be at least 3 characters long and contain only letters and spaces.`,

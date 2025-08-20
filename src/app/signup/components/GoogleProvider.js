@@ -8,15 +8,19 @@ import { Fragment, useState } from "react";
 import google from '@/app/assets/icons/google.svg'
 import Image from "next/image";
 import { useAuth } from "@/app/context/AuthContext";
+import BtnLoader from "@/app/utils/Loaders/btn/BtnLoader";
 
 export default function GoogleLoginButton() {
     const { login } = useAuth();
   
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
 
   const handleGoogleLogin = async () => {
+  setLoading(true);
+  setError(null);
     try{
     const provider = new GoogleAuthProvider();
     
@@ -37,17 +41,24 @@ export default function GoogleLoginButton() {
       if (!res.ok) {
         throw new Error(data.message || "حدث خطأ أثناء تسجيل الدخول.");
       }
-
-      await login(data.user);  }catch(err){
+      await login(data.user);
+    }catch(err){
     alert("حدث خطأ في الخادم. حاول لاحقاً");
-  }
+  }finally {
+      setLoading(false);
+    }
   };
     return (
     <Fragment>
       <button onClick={handleGoogleLogin} className=" w-full flex justify-center gap-2 font-semibold shadow-2xl bg-white text-black px-6 py-3 rounded">
+      {loading ? <BtnLoader/> : (
+        <>
       المواصلة باستخدام جوجل
         <Image width={30} height={30} src={google} alt='google'/>
+        </>
+      )}
       </button>
+
       {error && <p className="text-red-500">{error}</p>}
     </Fragment>
   );

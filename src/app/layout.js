@@ -4,7 +4,9 @@ import "./globals.css";
 import { Provider } from 'react-redux';
 import store from "@/lib/store";
 import { metadata } from "./components/metadata";
-import { AuthProvider } from '@/app/context/AuthContext'
+import { AuthProvider, useAuth } from '@/app/context/AuthContext'
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 const robotoSans = Roboto({
   variable: "--font-roboto-sans",
@@ -17,6 +19,17 @@ const robotoMono = Roboto_Mono({
 });
 
 export default function RootLayout({ children }) {
+  const router = useRouter();
+  // const { user, loading } = useAuth();
+  // useEffect(() => {
+  //   // Redirect to login if user is not authenticated
+  //   if (!loading && !user) {
+  //     router.push('/login');
+  //   }else if (user && router.pathname === '/login') {
+  //     router.push('/dashboard'); // Redirect to dashboard if user is authenticated and on login page
+  //   }
+  // }, [user, loading, router]);
+
   return (
     <Provider store={store}>  {/* Wrap the entire app with Redux provider */}
     <html lang="ar" dir="rtl">

@@ -24,18 +24,17 @@ const todoSchema = new mongoose.Schema({
   // New 'type' field
   type: {
     type: String,
-    enum: ['exam', 'interview', 'task'], // Restrict values to these options
-    required: true // Make sure this field is provided
+    enum: ['exam', 'interview', 'task'],
+    required: true 
   },
-  // New 'level' field
   level: {
     type: String,
-    enum: ['beginner', 'intermediate', 'advanced'], // Restrict values to these options
-    required: true // Make sure this field is provided
+    enum: ['beginner', 'intermediate', 'advanced'],
+    required: true 
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', // Reference to the User model
+    ref: 'User', 
     required: true,
   }
 });

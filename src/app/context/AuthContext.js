@@ -1,12 +1,10 @@
-'use client'; // Required for contexts inside app/
+'use client';
 
 import { createContext, useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 
-// 1. Create Context
 const AuthContext = createContext();
 
-// 2. Create Provider
 export const AuthProvider = ({ children }) => {
   const router = useRouter();
   const [user, setUser] = useState(null); // user = authenticated user
@@ -24,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (userData) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
-    router.push('/dashboard'); // Redirect to dashboard or home
+    router.push('/dashboard');
   };
 
   const logout = () => {
@@ -40,7 +38,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// 3. Custom hook to access auth
 export const useAuth = () => {
   return useContext(AuthContext);
 };

@@ -3,12 +3,12 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
-import { useRouter } from 'next/navigation';
+import ElementLoader from '../utils/Loaders/element/ElementLoader';
 
 const Navbar = () => {
   const { user, loading } = useAuth();
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <ElementLoader/>;
 
   return (
     <nav className="bg-white flex items-center justify-center md:justify-between  flex-wrap gap-2 shadow-xl p-3">

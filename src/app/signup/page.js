@@ -5,27 +5,78 @@ import GoogleLoginButton from "./components/GoogleProvider";
 import signup from '@/app/assets/imgs/signup.png';
 import Image from "next/image";
 import Link from "next/link";
-import InputField from "../utils/InputField"; // Assuming you've created InputField component
+import InputField, { errorMessages } from "../utils/InputField"; // Import errorMessages directly
 import { useAuth } from "../context/AuthContext";
+import { MAIL_REGEX, NAME_REGEX, PWD_REGEX } from "../constants/regex"; // Import regex patterns
 
 export default function SignupForm() {
-  const { login } = useAuth()
+  const { login } = useAuth();
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
   });
+  const [formErrors, setFormErrors] = useState({}); // New state to manage form errors
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Validation function
+  const validateForm = () => {
+    let errors = {};
+    let isValid = true;
+
+    // Validate firstName
+    if (!form.firstName.trim() || !new RegExp(NAME_REGEX).test(form.firstName.trim())) {
+      errors.firstName = errorMessages.firstName;
+      isValid = false;
+    }
+
+    // Validate lastName
+    if (!form.lastName.trim() || !new RegExp(NAME_REGEX).test(form.lastName.trim())) {
+      errors.lastName = errorMessages.lastName;
+      isValid = false;
+    }
+
+    // Validate email
+    if (!form.email.trim() || !new RegExp(MAIL_REGEX).test(form.email.trim())) {
+      errors.email = errorMessages.email;
+      isValid = false;
+    }
+
+    // Validate password
+    if (!form.password.trim() || !new RegExp(PWD_REGEX).test(form.password.trim())) {
+      errors.password = errorMessages.password;
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    // Clear error for the specific field as user types
+    if (formErrors[name]) {
+      setFormErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate the form before submission
+    const isValid = validateForm();
+    if (!isValid) {
+      setMessage('الرجاء تصحيح الأخطاء في النموذج قبل المتابعة.');
+      return; // Stop submission if there are validation errors
+    }
+
     setLoading(true);
+    setMessage(''); // Clear previous messages
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/signup`, {
         method: "POST",
@@ -38,13 +89,13 @@ export default function SignupForm() {
         login(data.user)
         setMessage('تم إنشاء الحساب بنجاح!');
       } else {
-      if (data.message && data.message.toLowerCase().includes('already exists')) {
-        setMessage('هذا البريد الإلكتروني مسجل بالفعل، الرجاء تسجيل الدخول أو استخدام بريد آخر.');
-      } else {
-        setMessage('حدث خطأ أثناء إنشاء الحساب، الرجاء المحاولة مرة أخرى.');
+        if (data.message && data.message.toLowerCase().includes('already exists')) {
+          setMessage('هذا البريد الإلكتروني مسجل بالفعل، الرجاء تسجيل الدخول أو استخدام بريد آخر.');
+        } else {
+          setMessage('حدث خطأ أثناء إنشاء الحساب، الرجاء المحاولة مرة أخرى.');
+        }
       }
-    }
-      } catch (err) {
+    } catch (err) {
       setMessage('فشل إنشاء حساب');
     } finally {
       setLoading(false);
@@ -71,6 +122,8 @@ export default function SignupForm() {
             name="firstName"
             placeholder="الاسم الأول"
             handleChange={handleChange}
+            value={form.firstName} // Pass value
+            error={formErrors.firstName} // Pass error message
           />
 
           {/* Last Name Field */}
@@ -79,6 +132,8 @@ export default function SignupForm() {
             name="lastName"
             placeholder="اسم العائلة"
             handleChange={handleChange}
+            value={form.lastName} // Pass value
+            error={formErrors.lastName} // Pass error message
           />
 
           {/* Email Field */}
@@ -87,6 +142,8 @@ export default function SignupForm() {
             name="email"
             placeholder="البريد الإلكتروني"
             handleChange={handleChange}
+            value={form.email} // Pass value
+            error={formErrors.email} // Pass error message
           />
 
           {/* Password Field */}
@@ -95,12 +152,15 @@ export default function SignupForm() {
             name="password"
             placeholder="كلمة المرور"
             handleChange={handleChange}
+            value={form.password} // Pass value
+            error={formErrors.password} // Pass error message
           />
 
           {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            disabled={loading} // Disable button while loading
           >
             {loading ? 'جاري التسجيل...' : 'إنشاء حساب'}
           </button>

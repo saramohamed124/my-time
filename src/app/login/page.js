@@ -5,26 +5,65 @@ import login_icon from '@/app/assets/imgs/login.png';
 import Image from "next/image";
 import Link from "next/link";
 import GoogleLoginButton from "../signup/components/GoogleProvider";
-import InputField from "../utils/InputField";  // Import the InputField component
+import InputField , { errorMessages } from "../utils/InputField";  // Import the InputField component
+import { MAIL_REGEX, PWD_REGEX } from "../constants/regex"; // Import regex patterns
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const { login } = useAuth();
+
   const [form, setForm] = useState({
     email: '',
     password: '',
   });
+
+  const [formErrors, setFormErrors] = useState({}); // New state to manage form errors
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Validation function
+  const validateForm = () => {
+    let errors = {};
+    let isValid = true;
+
+    // Validate email
+    if (!form.email.trim() || !new RegExp(MAIL_REGEX).test(form.email.trim())) {
+      errors.email = errorMessages.email;
+      isValid = false;
+    }
+
+    // Validate password
+    if (!form.password.trim() || !new RegExp(PWD_REGEX).test(form.password.trim())) {
+      errors.password = errorMessages.password;
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    // Clear error for the specific field as user types
+    if (formErrors[name]) {
+      setFormErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
+    }
   };
 
   const handleSubmit = async (e) => {
-    
     e.preventDefault();
+
+    // Validate the form before submission
+    const isValid = validateForm();
+    if (!isValid) {
+      setMessage('الرجاء تصحيح الأخطاء في النموذج قبل المتابعة.');
+      return; // Stop submission if there are validation errors
+    }
+
     setLoading(true);
+    setMessage(''); // Clear previous messages
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}auth/login`, {
         method: "POST",
@@ -65,11 +104,14 @@ export default function LoginPage() {
         <p className="text-sm text-center">ابدأ رحلتك نحو إنتاجية أعلى بتسجيل الدخول.</p>
         
         <form onSubmit={handleSubmit} className=" space-y-4">
+          {/* Email Field */}
           <InputField
             type="email"
             name="email"
             placeholder="البريد الإلكتروني"
             handleChange={handleChange}
+            value={form.email} // Pass value
+            error={formErrors.email} // Pass error message
           />
 
           {/* Password Field */}
@@ -78,6 +120,8 @@ export default function LoginPage() {
             name="password"
             placeholder="كلمة المرور"
             handleChange={handleChange}
+            value={form.password} // Pass value
+            error={formErrors.password} // Pass error message
           />
 
           <button

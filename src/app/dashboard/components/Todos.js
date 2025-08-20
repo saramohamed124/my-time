@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { fetchTodos, addTodoAsync, editTodoAsync, deleteTodoAsync } from '@/lib/features/todos/todoSlice';
 
-// ثابت لقيم الأنواع
 const TASK_TYPES = ['exam', 'interview', 'task'];
 const TASK_LEVELS = ['beginner', 'intermediate', 'advanced'];
 
@@ -12,7 +11,7 @@ const Todos = () => {
   const dispatch = useDispatch();
   const { todos, status, error } = useSelector((state) => state.todos);
 
-  const [userId, setUserId] = useState(null); // بدل user
+  const [userId, setUserId] = useState(null); 
   const [newTodo, setNewTodo] = useState({
     title: '',
     description: '',
@@ -25,7 +24,6 @@ const Todos = () => {
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
-    // نتحقق أولاً أننا في المتصفح
     if (typeof window !== 'undefined') {
       const user = JSON.parse(localStorage.getItem('user'));
       if (user && user.id) {

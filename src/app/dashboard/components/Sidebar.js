@@ -17,7 +17,7 @@ const Sidebar = () => {
   const { logout } = useAuth();
 
   return (
-    <aside className="h-screen w-fit md:w-64 bg-white shadow-xl flex flex-col p-2 md:p-6">
+    <aside className="h-screen w-fit md:w-64 bg-white shadow-xl flex flex-col p-2 md:p-6 whitespace-nowrap">
       <nav className="flex flex-col gap-6">
         <SidebarItem icon={dashboard} label="لوحة التحكم" link="/dashboard" />
         <SidebarItem icon={mission} label="المهام" link="/dashboard/missions" />
