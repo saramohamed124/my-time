@@ -24,457 +24,288 @@ mongoose.connect(process.env.MONGO_URI)
 
 
 // Define the schema for learning resources
-const learningResourceSchema = new mongoose.Schema({
-    platform: String,
+const youTubeResourceSchema = new mongoose.Schema({
     channel: String,
-    description: String
+    language: String,
+    content: String
 });
 
-// Define the schema for skills and tools.
-// We use 'mongoose.Schema.Types.Mixed' for 'core_skills'
-// to handle both array and object data structures.
-const skillsAndToolsSchema = new mongoose.Schema({
-    core_skills: mongoose.Schema.Types.Mixed,
-    additional_skills: String,
-    additional_tools: String
+// Define the schema for the required skills object
+// We use 'mongoose.Schema.Types.Mixed' to handle the various key-value pairs
+// within the 'required_skills' object, as its structure changes.
+const requiredSkillsSchema = new mongoose.Schema({
+    languages: mongoose.Schema.Types.Mixed,
+    frameworks: mongoose.Schema.Types.Mixed,
+    databases: mongoose.Schema.Types.Mixed,
+    tools: mongoose.Schema.Types.Mixed,
+    networking: String,
+    operating_systems: String,
+    other_skills: String
 });
 
-// Define the schema for a single specialization
+// Define the schema for a single specialization within a field
 const specializationSchema = new mongoose.Schema({
-    job_title: String,
-    responsibilities: String,
-    skills_and_tools: skillsAndToolsSchema,
-    learning_resources: [learningResourceSchema]
+    specialization: String,
+    tasks: String,
+    required_skills: requiredSkillsSchema,
+    youtube_resources: [youTubeResourceSchema]
 });
 
-// Define the main schema for engineering disciplines
-const engineeringDisciplineSchema = new mongoose.Schema({
-    discipline: String,
+// Define the main schema for a computer science field
+const computerScienceFieldSchema = new mongoose.Schema({
+    field: String,
+    description: String,
     specializations: [specializationSchema]
 });
 
 // Create the model from the main schema
-const EngineeringDiscipline = mongoose.model('EngineeringDiscipline', engineeringDisciplineSchema);
+const ComputerScienceField = mongoose.model('ComputerScienceField', computerScienceFieldSchema);
 
 // The complete JSON data provided by the user
-const engineeringData = {
-    "engineering_fields": [
+const computerScienceData = {
+    "computer_science_fields": [
         {
-            "discipline": "هندسة الميكاترونكس",
+            "field": "تطوير الويب (Web Development)",
+            "description": "هذا المجال يركز على بناء المواقع والتطبيقات التي تعمل عبر المتصفح.",
             "specializations": [
                 {
-                    "job_title": "مهندس أتمتة (Automation Engineer)",
-                    "responsibilities": "تصميم وتطوير أنظمة التحكم الصناعية. برمجة أجهزة التحكم المنطقي القابلة للبرمجة (PLC) لضمان عمل الآلات والمصانع بشكل آلي وفعال.",
-                    "skills_and_tools": {
-                        "core_skills": [
-                            "PLC (Siemens TIA Portal, Rockwell Studio 5000)",
-                            "HMI (Human-Machine Interface)"
+                    "specialization": "الواجهة الأمامية (Front-End Development)",
+                    "tasks": "بناء واجهة المستخدم التفاعلية التي يراها الزائر ويتفاعل معها.",
+                    "required_skills": {
+                        "languages": [
+                            "HTML",
+                            "CSS",
+                            "JavaScript"
                         ],
-                        "additional_skills": "برمجة الروبوتات"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "Automaton Academy",
-                            "description": "قناة عربية متخصصة في شرح PLC خطوة بخطوة."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "RealPars",
-                            "description": "قناة أجنبية تقدم دورات تفصيلية في مجال الأتمتة والتحكم الآلي."
-                        }
-                    ]
-                },
-                {
-                    "job_title": "مهندس روبوتات (Robotics Engineer)",
-                    "responsibilities": "يُصمم الروبوتات، ويبرمجها، ويطورها لتنفيذ مهام محددة بدقة.",
-                    "skills_and_tools": {
-                        "core_skills": {
-                            "برمجة": [
-                                "Python",
-                                "C++",
-                                "MATLAB"
-                            ],
-                            "منصات": [
-                                "Robot Operating System - ROS)"
-                            ]
-                        },
-                        "additional_tools": "أدوات المحاكاة (Gazebo, V-REP)"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "TheMocra",
-                            "description": "قناة عربية تركز على الروبوتات وبرمجة أنظمة التحكم."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "RoboHub",
-                            "description": "قناة أجنبية تعرض أحدث الأبحاث والتطورات في مجال الروبوتات."
-                        }
-                    ]
-                },
-                {
-                    "job_title": "تصميم وتصنيع الاسطمبات (Mold Design and Manufacturing)",
-                    "responsibilities": "تصميم وتصنيع القوالب (الاسطمبات) المستخدمة في إنتاج القطع البلاستيكية والمعدنية بالحقن أو الضغط.",
-                    "skills_and_tools": {
-                        "core_skills": [
-                            "CAD (SolidWorks, CATIA)",
-                            "CAM (Mastercam)"
-                        ],
-                        "additional_skills": "فهم علم المواد وعمليات التصنيع"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "GoEngineer",
-                            "description": "دروس متقدمة في SolidWorks."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "Autodesk Manufacturing",
-                            "description": "شروحات لاستخدام برامج التصنيع."
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "discipline": "هندسة الميكانيكا",
-            "specializations": [
-                {
-                    "job_title": "مهندس تصميم ميكانيكي (Mechanical Design Engineer)",
-                    "responsibilities": "يصمم المنتجات والآلات باستخدام برامج الحاسوب. يتأكد من أن التصميم يلبي المعايير الهندسية وأن المنتج سيكون آمنًا وعمليًا.",
-                    "skills_and_tools": {
-                        "core_skills": {
-                            "CAD": [
-                                "SolidWorks",
-                                "CATIA",
-                                "AutoCAD",
-                                "Inventor"
-                            ],
-                            "additional_tools": "FEA (Finite Element Analysis) مثل ANSYS وABAQUS"
-                        }
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "Hamed Shaker",
-                            "description": "قناة عربية ممتازة لتعلم SolidWorks وInventor."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "محاضرات المهندس محمود مرزوق",
-                            "description": "قناة عربية ممتازة لتعلم SolidWorks وInventor."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "GoEngineer",
-                            "description": "قناة أجنبية تقدم دروسًا متقدمة في SolidWorks."
-                        }
-                    ]
-                },
-                {
-                    "job_title": "مهندس إنتاج (Production Engineer)",
-                    "responsibilities": "يشرف على عمليات التصنيع في المصانع ويحسنها لزيادة الكفاءة والجودة وتقليل التكاليف.",
-                    "skills_and_tools": {
-                        "core_skills": [
-                            "CAM (Fusion 360, Mastercam)",
-                            "CNC Machining"
-                        ],
-                        "additional_skills": "إدارة الجودة"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "Autodesk Manufacturing",
-                            "description": "قناة رسمية لشركة أوتوديسك توضح كيفية استخدام برامجها في التصنيع."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "Titans of CNC",
-                            "description": "قناة أجنبية عن التصنيع وماكينات CNC."
-                        }
-                    ]
-                },
-                {
-                    "job_title": "ميكانيكا القوى (Power Mechanics)",
-                    "responsibilities": "تصميم وتحليل أنظمة توليد الطاقة، مثل محطات الطاقة البخارية والغازية، ومحركات الاحتراق الداخلي.",
-                    "skills_and_tools": {
-                        "core_skills": [
-                            "الديناميكا الحرارية",
-                            "ميكانيكا الموائع",
-                            "محاكاة الأنظمة (MATLAB/Simulink)"
+                        "frameworks": [
+                            "React.js",
+                            "Angular",
+                            "Vue.js"
                         ]
                     },
-                    "learning_resources": [
+                    "youtube_resources": [
                         {
-                            "platform": "YouTube",
-                            "channel": "Learn Engineering",
-                            "description": "شروحات لمبادئ الديناميكا الحرارية والمحركات."
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "discipline": "هندسة طبية",
-            "specializations": [
-                {
-                    "job_title": "مهندس أجهزة طبية (Medical Devices Engineer)",
-                    "responsibilities": "يشارك في تصميم وتطوير الأجهزة الطبية مثل أجهزة التصوير بالأشعة السينية أو أجهزة قياس ضغط الدم، ويضمن سلامة هذه الأجهزة وفعاليتها.",
-                    "skills_and_tools": {
-                        "core_skills": {
-                            "برامج تصميم ومحاكاة": [
-                                "SolidWorks",
-                                "MATLAB",
-                                "COMSOL Multiphysics"
-                            ]
-                        },
-                        "additional_skills": "برمجة (C++, Python) لتطوير برامج الأجهزة."
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "Learn Engineering",
-                            "description": "قناة أجنبية تشرح المبادئ الهندسية وراء الأجهزة الطبية."
+                            "channel": "Elzero Web School",
+                            "language": "عربي",
+                            "content": "الأفضل لتعلم HTML, CSS, JavaScript."
                         },
                         {
-                            "platform": "YouTube",
-                            "channel": "TED-Ed",
-                            "description": "تقدم فيديوهات عن الابتكارات في التكنولوجيا الطبية."
+                            "channel": "Codezone",
+                            "language": "عربي",
+                            "content": "ممتاز لتعلم React.js."
+                        },
+                        {
+                            "channel": "Elzero Web School",
+                            "language": "عربي",
+                            "content": "لتعلم Vue.js."
+                        },
+                        {
+                            "channel": "freeCodeCamp.org",
+                            "language": "إنجليزي",
+                            "content": "دورات شاملة في جميع المهارات."
                         }
                     ]
-                }
-            ]
-        },
-        {
-            "discipline": "الهندسة المعمارية",
-            "specializations": [
+                },
                 {
-                    "job_title": "مهندس معماري (Architect)",
-                    "responsibilities": "يخطط ويصمم المباني والمنشآت. يركز على الجانب الجمالي والوظيفي للهيكل، مع مراعاة السلامة والبيئة.",
-                    "skills_and_tools": {
-                        "core_skills": [
-                            "BIM (Building Information Modeling) مثل Revit",
-                            "CAD (Computer-Aided Design) مثل AutoCAD"
+                    "specialization": "الواجهة الخلفية (Back-End Development)",
+                    "tasks": "بناء منطق الموقع الذي يعمل على الخادم، مثل إدارة قواعد البيانات والمصادقة.",
+                    "required_skills": {
+                        "languages": [
+                            "Python (Django أو Flask)",
+                            "Node.js (مع Express)",
+                            "PHP (مع Laravel)"
+                        ],
+                        "databases": [
+                            "SQL",
+                            "MongoDB"
                         ]
                     },
-                    "learning_resources": [
+                    "youtube_resources": [
                         {
-                            "platform": "YouTube",
-                            "channel": "Architecture & Design",
-                            "description": "قناة أجنبية تعرض تصميمات معمارية مبدعة."
+                            "channel": "Elzero Web School",
+                            "language": "عربي",
+                            "content": "لتعلم PHP."
                         },
                         {
-                            "platform": "YouTube",
-                            "channel": "ArchiSketch",
-                            "description": "قناة تركز على فن الرسم المعماري باليد والبرامج."
-                        }
-                    ]
-                },
-                {
-                    "job_title": "مصمم داخلي (Interior Designer)",
-                    "responsibilities": "يركز على تصميم المساحات الداخلية للمباني، واختيار الأثاث والإضاءة والألوان لخلق بيئة جذابة ومريحة.",
-                    "skills_and_tools": {
-                        "core_skills": {
-                            "برامج التصميم ثلاثي الأبعاد ": [
-                                "3ds Max",
-                                "SketchUp"
-                            ]
-                        },
-                        "additional_tools": "برامج الرندر (Rendering) مثل V-Ray"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "3D Tuts",
-                            "description": "قناة أجنبية متخصصة في شرح برنامج 3ds Max."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "SketchUp",
-                            "description": "القناة الرسمية للبرنامج، وتقدم شروحات مفصلة."
+                            "channel": "Tarmiz Academy",
+                            "language": "عربي",
+                            "content": "لتعلم Python "
                         }
                     ]
                 }
             ]
         },
         {
-            "discipline": "هندسة مدنية",
+            "field": "تطوير تطبيقات الموبايل (Mobile App Development)",
+            "description": "هذا المسار يركز على بناء التطبيقات التي تعمل على الهواتف الذكية.",
             "specializations": [
                 {
-                    "job_title": "مهندس إنشائي (Structural Engineer)",
-                    "responsibilities": "يحلل ويصمم الهياكل الإنشائية مثل الجسور والمباني للتأكد من أنها قوية ومستقرة وآمنة.",
-                    "skills_and_tools": {
-                        "core_skills": {
-                            "برامج التحليل الإنشائي": [
-                                "SAP2000",
-                                "Etabs",
-                                "STAAD.Pro"
-                            ]
-                        },
-                        "additional_tools": "برامج التصميم (Revit Structure)"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "Civil Engineering",
-                            "description": "قناة أجنبية تقدم دروسًا في التحليل الإنشائي."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "The B1M",
-                            "description": "قناة أجنبية تعرض مشاريع بناء كبرى حول العالم."
-                        }
-                    ]
-                },
-                {
-                    "job_title": "مهندس طرق (Highway Engineer)",
-                    "responsibilities": "يشارك في تخطيط وتصميم الطرق والجسور وشبكات النقل.",
-                    "skills_and_tools": {
-                        "core_skills": "برامج التصميم (Civil 3D)",
-                        "additional_tools": "برامج محاكاة المرور (VISSIM)"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "Learn Civil 3D",
-                            "description": "قناة أجنبية متخصصة في Civil 3D."
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "discipline": "هندسة كيميائية",
-            "specializations": [
-                {
-                    "job_title": "مهندس عمليات (Process Engineer)",
-                    "responsibilities": "يُصمم العمليات الصناعية التي تحول المواد الخام إلى منتجات نهائية بطريقة فعالة واقتصادية وآمنة.",
-                    "skills_and_tools": {
-                        "core_skills": {
-                            "برامج محاكاة العمليات": [
-                                "Aspen Plus",
-                                "ChemCAD"
-                            ]
-                        },
-                        "additional_tools": "برامج تصميم المصانع (AutoCAD P&ID)"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "Chemical Engineering with Kevin Gaughan",
-                            "description": "قناة أجنبية متخصصة في شرح العمليات الكيميائية."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "Learn Engineering",
-                            "description": "تقدم شروحات لمختلف العمليات الهندسية."
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "discipline": "هندسة كهربائية",
-            "specializations": [
-                {
-                    "job_title": "مهندس إلكترونيات (Electronics Engineer)",
-                    "responsibilities": "يصمم الدوائر الإلكترونية والأنظمة المستخدمة في أجهزة الحاسوب، وأنظمة الاتصالات، والأنظمة الطبية.",
-                    "skills_and_tools": {
-                        "core_skills": {
-                            "برامج محاكاة الدوائر": [
-                                "Proteus",
-                                "Multisim"
-                            ]
-                        },
-                        "additional_tools": "برامج تصميم لوحات الدوائر المطبوعة (PCB) مثل Altium Designer, Eagle, KiCAD, Easy EDA"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "EEVblog",
-                            "description": "قناة أجنبية تقدم مراجعات وشروحات للأجهزة الإلكترونية."
-                        },
-                        {
-                            "platform": "YouTube",
-                            "channel": "Walid Issa",
-                            "description": "قناة عربية تقدم دورات في الإلكترونيات."
-                        }
-                    ]
-                },
-                {
-                    "job_title": "مهندس اتصالات (Telecommunications Engineer)",
-                    "responsibilities": "يشارك في تصميم شبكات الاتصالات وتطويرها وصيانتها، مثل شبكات الإنترنت والهاتف المحمول.",
-                    "skills_and_tools": {
-                        "core_skills": {
-                            "برامج محاكاة الشبكات": [
-                                "Cisco Packet Tracer",
-                                "GNS3"
-                            ]
-                        },
-                        "additional_tools": "أجهزة قياس الشبكات (مثل OTDR, Spectrum Analyzer)"
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "The Networking Doctor",
-                            "description": "قناة أجنبية متخصصة في شرح شبكات الاتصالات."
-                        }
-                    ]
-                },
-                {
-                    "job_title": "هندسة القوى الكهربائية (Electrical Power Engineering)",
-                    "responsibilities": "تصميم أنظمة توليد ونقل وتوزيع الطاقة الكهربائية.",
-                    "skills_and_tools": {
-                        "core_skills": {
-                            "برامج محاكاة الشبكات الكهربائية": [
-                                "ETAP",
-                                "PSIM"
-                            ]
-                        }
-                    },
-                    "learning_resources": [
-                        {
-                            "platform": "YouTube",
-                            "channel": "Electrical4U",
-                            "description": "شروحات باللغة الإنجليزية لمفاهيم القوى الكهربائية."
-                        }
-                    ]
-                },
-                {
-                    "job_title": "هندسة الشبكات الكهربائية (Electrical Grids Engineering)",
-                    "responsibilities": "تخطيط وتصميم وإدارة الشبكات الكهربائية وأنظمة التحكم بها.",
-                    "skills_and_tools": {
-                        "core_skills": [
-                            "SCADA systems",
-                            "GIS mapping"
+                    "specialization": "تطوير تطبيقات أندرويد (Android Development)",
+                    "tasks": "بناء تطبيقات تعمل على نظام أندرويد.",
+                    "required_skills": {
+                        "languages": [
+                            "Kotlin",
+                            "Java"
+                        ],
+                        "tools": [
+                            "Android Studio"
                         ]
                     },
-                    "learning_resources": [
+                    "youtube_resources": [
                         {
-                            "platform": "YouTube",
-                            "channel": "The B1M",
-                            "description": "فيديوهات عن مشاريع البنية التحتية ومنها الشبكات الكهربائية."
+                            "channel": "حسونه اكاديمي",
+                            "language": "عربي",
+                            "content": "دورات كاملة في تطوير تطبيقات أندرويد."
+                        },
+                        {
+                            "channel": "freeCodeCamp.org",
+                            "language": "إنجليزي",
+                            "content": "دورات شاملة في Kotlin."
+                        }
+                    ]
+                },
+                {
+                    "specialization": "تطوير التطبيقات متعددة المنصات (Cross-Platform Development)",
+                    "tasks": "بناء تطبيق واحد يعمل على نظامي أندرويد و iOS في نفس الوقت.",
+                    "required_skills": {
+                        "frameworks": [
+                            "Flutter",
+                            "React Native"
+                        ],
+                        "languages": [
+                            "Dart",
+                            "JavaScript"
+                        ]
+                    },
+                    "youtube_resources": [
+                        {
+                            "channel": "وائل أبو حمزة",
+                            "language": "عربي",
+                            "content": "دورة كاملة في Flutter."
+                        },
+                        {
+                            "channel": "Academind",
+                            "language": "إنجليزي",
+                            "content": "شروحات ممتازة لـ React Native."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "field": "علوم البيانات والذكاء الاصطناعي (Data Science & AI)",
+            "description": "هذا المجال يركز على تحليل البيانات الضخمة وبناء نماذج الذكاء الاصطناعي.",
+            "specializations": [
+                {
+                    "specialization": "عالم بيانات (Data Scientist)",
+                    "tasks": "تحليل البيانات واستخلاص رؤى مفيدة منها لاتخاذ قرارات العمل.",
+                    "required_skills": {
+                        "languages": [
+                            "Python (Pandas, NumPy)"
+                        ],
+                        "databases": [
+                            "SQL"
+                        ],
+                        "other_skills": "التحليل الإحصائي"
+                    },
+                    "youtube_resources": [
+                        {
+                            "channel": "Dataquest",
+                            "language": "إنجليزي",
+                            "content": "قناة متخصصة في علوم البيانات."
+                        },
+                        {
+                            "channel": "Simplilearn",
+                            "language": "إنجليزي",
+                            "content": "شروحات للذكاء الاصطناعي والتعلم الآلي."
+                        }
+                    ]
+                },
+                {
+                    "specialization": "مهندس تعلم آلي (Machine Learning Engineer)",
+                    "tasks": "بناء وتطوير نماذج التعلم الآلي والذكاء الاصطناعي ونشرها.",
+                    "required_skills": {
+                        "languages": [
+                            "Python (TensorFlow أو PyTorch)"
+                        ],
+                        "other_skills": "الرياضيات (الجبر الخطي، التفاضل، والإحصاء)"
+                    },
+                    "youtube_resources": [
+                        {
+                            "channel": "3Blue1Brown",
+                            "language": "إنجليزي",
+                            "content": "لشرح المفاهيم الرياضية المعقدة."
+                        },
+                        {
+                            "channel": "Andrew Ng's Courses",
+                            "language": "إنجليزي",
+                            "content": "أفضل دورات مجانية في التعلم الآلي."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "field": "الأمن السيبراني (Cybersecurity)",
+            "description": "هذا المسار يركز على حماية الأنظمة والشبكات والبيانات من الهجمات الإلكترونية.",
+            "specializations": [
+                {
+                    "specialization": "محلل أمني (Security Analyst)",
+                    "tasks": "مراقبة الشبكات والأنظمة بحثًا عن التهديدات الأمنية والاستجابة لها.",
+                    "required_skills": {
+                        "networking": "أساسيات الشبكات (TCP/IP)",
+                        "operating_systems": "Linux",
+                        "tools": [
+                            "Wireshark",
+                            "Nmap"
+                        ]
+                    },
+                    "youtube_resources": [
+                        {
+                            "channel": "Hackers Academy",
+                            "language": "عربي",
+                            "content": "قناة متخصصة في الأمن السيبراني."
+                        },
+                        {
+                            "channel": "NetworkChuck",
+                            "language": "إنجليزي",
+                            "content": "يركز على أمن الشبكات."
+                        }
+                    ]
+                },
+                {
+                    "specialization": "مختبر اختراق (Penetration Tester)",
+                    "tasks": "اختبار الأنظمة والشبكات بشكل قانوني لاكتشاف الثغرات الأمنية.",
+                    "required_skills": {
+                        "languages": [
+                            "Python",
+                            "Bash"
+                        ],
+                        "operating_systems": "Kali Linux"
+                    },
+                    "youtube_resources": [
+                        {
+                            "channel": "HackerSploit",
+                            "language": "إنجليزي",
+                            "content": "يقدم دروسًا في اختبار الاختراق."
                         }
                     ]
                 }
             ]
         }
     ]
-};
+}
 
 // Function to seed the database with the JSON data
 const seedDB = async () => {
     try {
         // Clear the collection first to prevent duplicate entries
-        await EngineeringDiscipline.deleteMany({});
+        await ComputerScienceField.deleteMany({});
         console.log('Previous data cleared.');
 
         // Insert the data from the JSON object
-        for (const discipline of engineeringData.engineering_fields) {
-            await EngineeringDiscipline.create(discipline);
+        for (const field of computerScienceData.computer_science_fields) {
+            await ComputerScienceField.create(field);
         }
 
         console.log('Database seeded successfully!');
