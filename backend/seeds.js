@@ -23,271 +23,254 @@ mongoose.connect(process.env.MONGO_URI)
 });
 
 
-// Define the schema for learning resources
-const youTubeResourceSchema = new mongoose.Schema({
+// Define the schema for YouTube resources
+const youtubeResourceSchema = new mongoose.Schema({
     channel: String,
     language: String,
     content: String
 });
 
-// Define the schema for the required skills object
-// We use 'mongoose.Schema.Types.Mixed' to handle the various key-value pairs
-// within the 'required_skills' object, as its structure changes.
+// Define the schema for required skills and tools
 const requiredSkillsSchema = new mongoose.Schema({
-    languages: mongoose.Schema.Types.Mixed,
-    frameworks: mongoose.Schema.Types.Mixed,
-    databases: mongoose.Schema.Types.Mixed,
-    tools: mongoose.Schema.Types.Mixed,
-    networking: String,
-    operating_systems: String,
-    other_skills: String
+    skills: [String],
+    tools: [String],
+    principles: String,
+    software: [String],
+    methodologies: [String],
+    databases: String,
+    programming_knowledge: String,
 });
 
-// Define the schema for a single specialization within a field
+// Define the schema for a single specialization
 const specializationSchema = new mongoose.Schema({
     specialization: String,
     tasks: String,
     required_skills: requiredSkillsSchema,
-    youtube_resources: [youTubeResourceSchema]
+    youtube_resources: [youtubeResourceSchema]
 });
 
-// Define the main schema for a computer science field
-const computerScienceFieldSchema = new mongoose.Schema({
-    field: String,
+// Define the main schema for business administration disciplines
+const businessDisciplineSchema = new mongoose.mongoose.Schema({
+    discipline: String,
     description: String,
     specializations: [specializationSchema]
 });
 
 // Create the model from the main schema
-const ComputerScienceField = mongoose.model('ComputerScienceField', computerScienceFieldSchema);
+const BusinessDiscipline = mongoose.model('BusinessDiscipline', businessDisciplineSchema);
 
 // The complete JSON data provided by the user
-const computerScienceData = {
-    "computer_science_fields": [
+const businessData = {
+    "business_administration_fields": [
         {
-            "field": "تطوير الويب (Web Development)",
-            "description": "هذا المجال يركز على بناء المواقع والتطبيقات التي تعمل عبر المتصفح.",
+            "discipline": "المحاسبة (Accounting)",
+            "description": "هذا المجال يركز على تسجيل وتحليل وتلخيص المعاملات المالية للشركة.",
             "specializations": [
                 {
-                    "specialization": "الواجهة الأمامية (Front-End Development)",
-                    "tasks": "بناء واجهة المستخدم التفاعلية التي يراها الزائر ويتفاعل معها.",
+                    "specialization": "المحاسبة المالية (Financial Accounting)",
+                    "tasks": "إعداد التقارير المالية (قائمة الدخل، الميزانية العمومية) التي تُستخدم من قبل الأطراف الخارجية مثل المستثمرين والبنوك.",
                     "required_skills": {
-                        "languages": [
-                            "HTML",
-                            "CSS",
-                            "JavaScript"
-                        ],
-                        "frameworks": [
-                            "React.js",
-                            "Angular",
-                            "Vue.js"
-                        ]
-                    },
-                    "youtube_resources": [
-                        {
-                            "channel": "Elzero Web School",
-                            "language": "عربي",
-                            "content": "الأفضل لتعلم HTML, CSS, JavaScript."
-                        },
-                        {
-                            "channel": "Codezone",
-                            "language": "عربي",
-                            "content": "ممتاز لتعلم React.js."
-                        },
-                        {
-                            "channel": "Elzero Web School",
-                            "language": "عربي",
-                            "content": "لتعلم Vue.js."
-                        },
-                        {
-                            "channel": "freeCodeCamp.org",
-                            "language": "إنجليزي",
-                            "content": "دورات شاملة في جميع المهارات."
-                        }
-                    ]
-                },
-                {
-                    "specialization": "الواجهة الخلفية (Back-End Development)",
-                    "tasks": "بناء منطق الموقع الذي يعمل على الخادم، مثل إدارة قواعد البيانات والمصادقة.",
-                    "required_skills": {
-                        "languages": [
-                            "Python (Django أو Flask)",
-                            "Node.js (مع Express)",
-                            "PHP (مع Laravel)"
-                        ],
-                        "databases": [
-                            "SQL",
-                            "MongoDB"
-                        ]
-                    },
-                    "youtube_resources": [
-                        {
-                            "channel": "Elzero Web School",
-                            "language": "عربي",
-                            "content": "لتعلم PHP."
-                        },
-                        {
-                            "channel": "Tarmiz Academy",
-                            "language": "عربي",
-                            "content": "لتعلم Python "
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "field": "تطوير تطبيقات الموبايل (Mobile App Development)",
-            "description": "هذا المسار يركز على بناء التطبيقات التي تعمل على الهواتف الذكية.",
-            "specializations": [
-                {
-                    "specialization": "تطوير تطبيقات أندرويد (Android Development)",
-                    "tasks": "بناء تطبيقات تعمل على نظام أندرويد.",
-                    "required_skills": {
-                        "languages": [
-                            "Kotlin",
-                            "Java"
+                        "principles": "المبادئ المحاسبية (GAAP / IFRS)",
+                        "software": [
+                            "QuickBooks",
+                            "SAP",
+                            "Oracle"
                         ],
                         "tools": [
-                            "Android Studio"
+                            "Microsoft Excel"
                         ]
                     },
                     "youtube_resources": [
                         {
-                            "channel": "حسونه اكاديمي",
+                            "channel": "Farah Qutob",
                             "language": "عربي",
-                            "content": "دورات كاملة في تطوير تطبيقات أندرويد."
+                            "content": "لشرح المبادئ المحاسبية."
                         },
                         {
-                            "channel": "freeCodeCamp.org",
+                            "channel": "Accounting Stuff",
                             "language": "إنجليزي",
-                            "content": "دورات شاملة في Kotlin."
+                            "content": "لدروس مبسطة في المحاسبة."
                         }
                     ]
                 },
                 {
-                    "specialization": "تطوير التطبيقات متعددة المنصات (Cross-Platform Development)",
-                    "tasks": "بناء تطبيق واحد يعمل على نظامي أندرويد و iOS في نفس الوقت.",
+                    "specialization": "المحاسبة الإدارية (Managerial Accounting)",
+                    "tasks": "توفير معلومات مالية للإدارة الداخلية لمساعدتها في اتخاذ القرارات اليومية والاستراتيجية.",
                     "required_skills": {
-                        "frameworks": [
-                            "Flutter",
-                            "React Native"
-                        ],
-                        "languages": [
-                            "Dart",
-                            "JavaScript"
+                        "skills": [
+                            "تحليل التكاليف (فهم تكاليف الإنتاج)",
+                            "تحليل الميزانية (إعداد الميزانية ومراقبتها)"
                         ]
                     },
                     "youtube_resources": [
                         {
-                            "channel": "وائل أبو حمزة",
-                            "language": "عربي",
-                            "content": "دورة كاملة في Flutter."
-                        },
-                        {
-                            "channel": "Academind",
+                            "channel": "Edspira",
                             "language": "إنجليزي",
-                            "content": "شروحات ممتازة لـ React Native."
+                            "content": "لشرح مفاهيم المحاسبة الإدارية."
                         }
                     ]
                 }
             ]
         },
         {
-            "field": "علوم البيانات والذكاء الاصطناعي (Data Science & AI)",
-            "description": "هذا المجال يركز على تحليل البيانات الضخمة وبناء نماذج الذكاء الاصطناعي.",
+            "discipline": "التسويق (Marketing)",
+            "description": "هذا المجال يهدف إلى الترويج للمنتجات وزيادة الوعي بالعلامة التجارية.",
             "specializations": [
                 {
-                    "specialization": "عالم بيانات (Data Scientist)",
-                    "tasks": "تحليل البيانات واستخلاص رؤى مفيدة منها لاتخاذ قرارات العمل.",
+                    "specialization": "التسويق الرقمي (Digital Marketing)",
+                    "tasks": "استخدام القنوات الرقمية (محركات البحث، وسائل التواصل الاجتماعي) للوصول إلى الجمهور.",
                     "required_skills": {
-                        "languages": [
-                            "Python (Pandas, NumPy)"
+                        "skills": [
+                            "تحسين محركات البحث (SEO)",
+                            "إعلانات الدفع لكل نقرة (PPC)",
+                            "تحليل البيانات"
                         ],
-                        "databases": [
-                            "SQL"
-                        ],
-                        "other_skills": "التحليل الإحصائي"
+                        "tools": [
+                            "SEMrush",
+                            "Google Ads",
+                            "Meta Ads",
+                            "Google Analytics"
+                        ]
                     },
                     "youtube_resources": [
                         {
-                            "channel": "Dataquest",
-                            "language": "إنجليزي",
-                            "content": "قناة متخصصة في علوم البيانات."
+                            "channel": "Ramy El-Dahan",
+                            "language": "عربي",
+                            "content": "متخصص في التسويق الرقمي."
                         },
+                        {
+                            "channel": "Neil Patel",
+                            "language": "إنجليزي",
+                            "content": "يقدم نصائح في كل جوانب التسويق الرقمي."
+                        }
+                    ]
+                },
+                {
+                    "specialization": "تسويق المحتوى (Content Marketing)",
+                    "tasks": "إنشاء محتوى جذاب (مقالات، فيديوهات، صور) لجذب العملاء.",
+                    "required_skills": {
+                        "skills": [
+                            "كتابة المحتوى",
+                            "تصميم الجرافيك",
+                            "تحرير الفيديو"
+                        ],
+                        "tools": [
+                            "Canva",
+                            "Adobe Photoshop",
+                            "Adobe Premiere Pro"
+                        ]
+                    },
+                    "youtube_resources": [
+                        {
+                            "channel": "محـمـد خـيـال Mohamed Khayal ",
+                            "language": "عربي",
+                            "content": "لتعلم تصميم الجرافيك."
+                        },
+                        {
+                            "channel": "مصطفى مكرم",
+                            "language": "عربي",
+                            "content": "لتعلم تصميم الجرافيك."
+                        },
+                        {
+                            "channel": "Cinecom.net",
+                            "language": "إنجليزي",
+                            "content": "لتعلم تحرير الفيديو."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "discipline": "الموارد البشرية (Human Resources)",
+            "description": "هذا المجال يركز على إدارة الموظفين في الشركة.",
+            "specializations": [
+                {
+                    "specialization": "التوظيف والاحتفاظ بالمواهب (Talent Acquisition)",
+                    "tasks": "جذب أفضل المرشحين وإجراء المقابلات واختيار الموظفين الجدد.",
+                    "required_skills": {
+                        "skills": [
+                            "فهم قوانين التوظيف",
+                            "مهارات المقابلات"
+                        ]
+                    },
+                    "youtube_resources": [
+                        {
+                            "channel": "HRCI Certification",
+                            "language": "إنجليزي",
+                            "content": "قناة رسمية لشهادات الموارد البشرية."
+                        },
+                        {
+                            "channel": "The Muse",
+                            "language": "إنجليزي",
+                            "content": "لتقديم نصائح في التوظيف."
+                        }
+                    ]
+                },
+                {
+                    "specialization": "إدارة الأداء والتطوير (Performance Management)",
+                    "tasks": "تقييم أداء الموظفين وتقديم التدريب والدعم لتطوير مهاراتهم.",
+                    "required_skills": {
+                        "skills": [
+                            "إدارة الأداء (وضع أهداف وتقييمها)",
+                            "مهارات القيادة (تحفيز وتوجيه الفريق)"
+                        ]
+                    },
+                    "youtube_resources": [
+                        {
+                            "channel": "Harvard Business Review",
+                            "language": "إنجليزي",
+                            "content": "لمفاهيم القيادة وإدارة الفرق."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "discipline": "نظم المعلومات الإدارية (MIS)",
+            "description": "هذا المجال يجمع بين الإدارة وتكنولوجيا المعلومات، ويركز على استخدام البيانات لتحسين قرارات العمل.",
+            "specializations": [
+                {
+                    "specialization": "تحليل النظم (Systems Analysis)",
+                    "tasks": "دراسة العمليات التجارية وتحليل البيانات لتحديد الاحتياجات التكنولوجية للمؤسسة.",
+                    "required_skills": {
+                        "databases": "SQL",
+                        "tools": [
+                            "Power BI",
+                            "Tableau"
+                        ],
+                        "programming_knowledge": "فهم أساسيات Python."
+                    },
+                    "youtube_resources": [
                         {
                             "channel": "Simplilearn",
                             "language": "إنجليزي",
-                            "content": "شروحات للذكاء الاصطناعي والتعلم الآلي."
+                            "content": "لشرح تحليل النظم وأدواته."
+                        },
+                        {
+                            "channel": "Edspira",
+                            "language": "إنجليزي",
+                            "content": "لمفاهيم إدارة قواعد البيانات."
                         }
                     ]
                 },
                 {
-                    "specialization": "مهندس تعلم آلي (Machine Learning Engineer)",
-                    "tasks": "بناء وتطوير نماذج التعلم الآلي والذكاء الاصطناعي ونشرها.",
+                    "specialization": "إدارة المشاريع (Project Management)",
+                    "tasks": "تخطيط وإدارة مشاريع تكنولوجيا المعلومات لضمان إتمامها في الوقت المحدد وفي حدود الميزانية.",
                     "required_skills": {
-                        "languages": [
-                            "Python (TensorFlow أو PyTorch)"
+                        "methodologies": [
+                            "Agile",
+                            "Scrum"
                         ],
-                        "other_skills": "الرياضيات (الجبر الخطي، التفاضل، والإحصاء)"
-                    },
-                    "youtube_resources": [
-                        {
-                            "channel": "3Blue1Brown",
-                            "language": "إنجليزي",
-                            "content": "لشرح المفاهيم الرياضية المعقدة."
-                        },
-                        {
-                            "channel": "Andrew Ng's Courses",
-                            "language": "إنجليزي",
-                            "content": "أفضل دورات مجانية في التعلم الآلي."
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "field": "الأمن السيبراني (Cybersecurity)",
-            "description": "هذا المسار يركز على حماية الأنظمة والشبكات والبيانات من الهجمات الإلكترونية.",
-            "specializations": [
-                {
-                    "specialization": "محلل أمني (Security Analyst)",
-                    "tasks": "مراقبة الشبكات والأنظمة بحثًا عن التهديدات الأمنية والاستجابة لها.",
-                    "required_skills": {
-                        "networking": "أساسيات الشبكات (TCP/IP)",
-                        "operating_systems": "Linux",
-                        "tools": [
-                            "Wireshark",
-                            "Nmap"
+                        "software": [
+                            "Trello",
+                            "Asana"
                         ]
                     },
                     "youtube_resources": [
                         {
-                            "channel": "Hackers Academy",
-                            "language": "عربي",
-                            "content": "قناة متخصصة في الأمن السيبراني."
-                        },
-                        {
-                            "channel": "NetworkChuck",
+                            "channel": "Project Management Institute (PMI)",
                             "language": "إنجليزي",
-                            "content": "يركز على أمن الشبكات."
-                        }
-                    ]
-                },
-                {
-                    "specialization": "مختبر اختراق (Penetration Tester)",
-                    "tasks": "اختبار الأنظمة والشبكات بشكل قانوني لاكتشاف الثغرات الأمنية.",
-                    "required_skills": {
-                        "languages": [
-                            "Python",
-                            "Bash"
-                        ],
-                        "operating_systems": "Kali Linux"
-                    },
-                    "youtube_resources": [
-                        {
-                            "channel": "HackerSploit",
-                            "language": "إنجليزي",
-                            "content": "يقدم دروسًا في اختبار الاختراق."
+                            "content": "قناة متخصصة في إدارة المشاريع."
                         }
                     ]
                 }
@@ -300,12 +283,12 @@ const computerScienceData = {
 const seedDB = async () => {
     try {
         // Clear the collection first to prevent duplicate entries
-        await ComputerScienceField.deleteMany({});
+        await BusinessDiscipline.deleteMany({});
         console.log('Previous data cleared.');
 
         // Insert the data from the JSON object
-        for (const field of computerScienceData.computer_science_fields) {
-            await ComputerScienceField.create(field);
+        for (const discipline of businessData.business_administration_fields) {
+            await BusinessDiscipline.create(discipline);
         }
 
         console.log('Database seeded successfully!');
