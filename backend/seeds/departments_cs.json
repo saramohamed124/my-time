@@ -46,7 +46,7 @@
                     "specialization": "الواجهة الخلفية (Back-End Development)",
                     "tasks": "بناء منطق الموقع الذي يعمل على الخادم، مثل إدارة قواعد البيانات والمصادقة.",
                     "required_skills": {
-                        "programming_languages": [
+                        "languages": [
                             "Python (Django أو Flask)",
                             "Node.js (مع Express)",
                             "PHP (مع Laravel)"
@@ -79,7 +79,7 @@
                     "specialization": "تطوير تطبيقات أندرويد (Android Development)",
                     "tasks": "بناء تطبيقات تعمل على نظام أندرويد.",
                     "required_skills": {
-                        "programming_languages": [
+                        "languages": [
                             "Kotlin",
                             "Java"
                         ],
@@ -136,7 +136,7 @@
                     "specialization": "عالم بيانات (Data Scientist)",
                     "tasks": "تحليل البيانات واستخلاص رؤى مفيدة منها لاتخاذ قرارات العمل.",
                     "required_skills": {
-                        "programming_languages": [
+                        "languages": [
                             "Python (Pandas, NumPy)"
                         ],
                         "databases": [
@@ -161,7 +161,7 @@
                     "specialization": "مهندس تعلم آلي (Machine Learning Engineer)",
                     "tasks": "بناء وتطوير نماذج التعلم الآلي والذكاء الاصطناعي ونشرها.",
                     "required_skills": {
-                        "programming_languages": [
+                        "languages": [
                             "Python (TensorFlow أو PyTorch)"
                         ],
                         "other_skills": "الرياضيات (الجبر الخطي، التفاضل، والإحصاء)"
@@ -213,7 +213,7 @@
                     "specialization": "مختبر اختراق (Penetration Tester)",
                     "tasks": "اختبار الأنظمة والشبكات بشكل قانوني لاكتشاف الثغرات الأمنية.",
                     "required_skills": {
-                        "programming_languages": [
+                        "languages": [
                             "Python",
                             "Bash"
                         ],
