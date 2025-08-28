@@ -5,6 +5,7 @@ import Navbar from '@/app/components/Navbar';
 import Sidebar from './components/Sidebar';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import Loader from '../utils/Loaders/element/Loader';
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
@@ -16,6 +17,13 @@ export default function DashboardLayout({ children }) {
       router.push('/login');
     }
   }, [user, loading, router]);
+      if (loading || !user) {
+        return(
+        <div className='flex justify-center items-center h-screen'>
+            <Loader />
+        </div>
+        )
+    }
   return (
     <article>
       <Navbar />

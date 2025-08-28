@@ -8,6 +8,7 @@ import GoogleLoginButton from "../signup/components/GoogleProvider";
 import InputField , { errorMessages } from "../utils/InputField";  // Import the InputField component
 import { MAIL_REGEX, PWD_REGEX } from "../constants/regex"; // Import regex patterns
 import { useAuth } from "../context/AuthContext";
+import PublicRoute from "../components/PublicRoutes";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -90,6 +91,7 @@ export default function LoginPage() {
   };
 
   return (
+    <PublicRoute>
     <article className="container w-full grid grid-cols-1 md:grid-cols-2 justify-center h-full items-center my-0 md:my-4 mx-auto">
       <header className="flex flex-col justify-center items-center md:items-start md:justify-between h-full">
         <section className="flex items-center mb-4">
@@ -151,5 +153,6 @@ export default function LoginPage() {
         </footer>
       </main>
     </article>
+    </PublicRoute>
   );
 }

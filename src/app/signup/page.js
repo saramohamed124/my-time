@@ -8,6 +8,7 @@ import Link from "next/link";
 import InputField, { errorMessages } from "../utils/InputField"; // Import errorMessages directly
 import { useAuth } from "../context/AuthContext";
 import { MAIL_REGEX, NAME_REGEX, PWD_REGEX } from "../constants/regex"; // Import regex patterns
+import PublicRoute from "../components/PublicRoutes";
 
 export default function SignupForm() {
   const { login } = useAuth();
@@ -103,6 +104,7 @@ export default function SignupForm() {
   };
 
   return (
+    <PublicRoute>
     <article className="container w-full grid grid-cols-1 md:grid-cols-2 justify-center items-center my-0 md:my-10 mx-auto">
       <header className="flex flex-col justify-center items-center md:items-start md:justify-between h-full">
         <section className="flex items-center">
@@ -185,5 +187,6 @@ export default function SignupForm() {
         </footer>
       </main>
     </article>
+    </PublicRoute>
   );
 }

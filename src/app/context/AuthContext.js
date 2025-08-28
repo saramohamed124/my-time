@@ -20,8 +20,10 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (userData) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+    const userToStore = { ...userData };
+    delete userToStore.password; // Remove password before storing
+    setUser(userToStore);
+    localStorage.setItem('user', JSON.stringify(userToStore));
     router.push('/dashboard');
   };
 
