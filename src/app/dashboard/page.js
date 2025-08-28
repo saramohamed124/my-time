@@ -1,3 +1,4 @@
+import Loader from '../utils/Loaders/element/Loader';
 import InProgress from '../utils/pages/InProgress';
 
 const TodoPage = () => {
