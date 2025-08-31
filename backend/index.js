@@ -18,6 +18,9 @@ app.use(express.json());
 require("dotenv").config();
 
 const path = require('path');
+const EngineeringDiscipline = require('./models/EngineeringDiscipline');
+const ComputerScienceField = require('./models/ComputerScienceField');
+const BusinessDiscipline = require('./models/BusinessDiscipline');
 
 
 
@@ -339,7 +342,33 @@ app.delete('/todos/:id', async (req, res) => {
   }
 });
 
+// Jobs & Specialties
+app.get('/engineering-specialties', async (req, res) => {
+  try {
+    const specialties = await EngineeringDiscipline.find();
+    res.status(200).json(specialties);
+  }catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء جلب التخصصات', error: err.message });
+  }
+});
 
+app.get('/cs-specialties', async (req, res) => {
+  try {
+    const specialties = await ComputerScienceField.find();
+    res.status(200).json(specialties);
+  }catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء جلب التخصصات', error: err.message });
+  }
+});
+
+app.get('/business-specialties', async (req, res) => {
+  try {
+    const specialties = await BusinessDiscipline.find();
+    res.status(200).json(specialties);
+  }catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء جلب التخصصات', error: err.message });
+  }
+});
 
 // Start the server
 app.listen(process.env.PORT, () => {

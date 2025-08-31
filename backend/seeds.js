@@ -63,7 +63,7 @@ const BusinessDiscipline = mongoose.model('BusinessDiscipline', businessDiscipli
 const businessData = {
     "business_administration_fields": [
         {
-            "discipline": "المحاسبة (Accounting)",
+            "discipline": "المحاسبة",
             "description": "هذا المجال يركز على تسجيل وتحليل وتلخيص المعاملات المالية للشركة.",
             "specializations": [
                 {
@@ -113,7 +113,7 @@ const businessData = {
             ]
         },
         {
-            "discipline": "التسويق (Marketing)",
+            "discipline": "التسويق",
             "description": "هذا المجال يهدف إلى الترويج للمنتجات وزيادة الوعي بالعلامة التجارية.",
             "specializations": [
                 {
@@ -181,7 +181,7 @@ const businessData = {
             ]
         },
         {
-            "discipline": "الموارد البشرية (Human Resources)",
+            "discipline": "الموارد البشرية",
             "description": "هذا المجال يركز على إدارة الموظفين في الشركة.",
             "specializations": [
                 {
@@ -226,7 +226,7 @@ const businessData = {
             ]
         },
         {
-            "discipline": "نظم المعلومات الإدارية (MIS)",
+            "discipline": "نظم المعلومات الإدارية",
             "description": "هذا المجال يجمع بين الإدارة وتكنولوجيا المعلومات، ويركز على استخدام البيانات لتحسين قرارات العمل.",
             "specializations": [
                 {

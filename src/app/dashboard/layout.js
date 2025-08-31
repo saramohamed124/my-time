@@ -22,7 +22,7 @@ export default function DashboardLayout({ children }) {
         return(
         <div className='flex justify-center items-center h-screen text-redirect'>
             <Loader />
-            <div className="text" data-text="Redirecting..."></div>
+            {/* <div className="text" data-text="Redirecting..."></div> */}
         </div>
         )
     }
