@@ -1,6 +1,6 @@
 'use client';
 
-import { MAIL_REGEX, NAME_REGEX } from '@/app/constants/regex';
+import { MAIL_REGEX, NAME_REGEX, PWD_REGEX } from '@/app/constants/regex';
 import { useAuth } from '@/app/context/AuthContext';
 import { errorMessages } from '@/app/utils/InputField';
 import React, { useState, useEffect } from 'react';
@@ -16,9 +16,10 @@ const GraduationCap = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" 
 
 const Profile = () => {
   const { user } = useAuth();
-  const userId = user ? user._id : null;
+  const userId = user ? user._id  || user.id : null;
   const [userData, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingPass, setLoadingPassword] = useState(false);
   const [profileMessage, setProfileMessage] = useState({ text: '', type: '' });
   const [passwordMessage, setPasswordMessage] = useState({ text: '', type: '' });
     const [formErrors, setFormErrors] = useState({}); // New state to manage form errors
@@ -71,12 +72,10 @@ const Profile = () => {
         errors.email = errorMessages.email;
         isValid = false;
       }
-  
-      // Validate password
-      // if (!formData.password.trim() || !new RegExp(PWD_REGEX).test(formData.password.trim())) {
-      //   errors.password = errorMessages.password;
-      //   isValid = false;
-      // }
+      if(formData.specialty_id === '') {
+        errors.specialty_id = "الرجاء اختيار تخصص.";
+        isValid = false;
+      }
   
       setFormErrors(errors);
       return isValid;
@@ -152,8 +151,13 @@ const Profile = () => {
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setPasswordMessage({ text: '', type: '' });
+      if (!passwordData.oldPassword.trim() || !new RegExp(PWD_REGEX).test(passwordData.oldPassword.trim()) ||
+          !passwordData.newPassword.trim() || !new RegExp(PWD_REGEX).test(passwordData.newPassword.trim())) {
+        return setPasswordMessage({ text: "كلمة المرور يجب أن تحتوي على حرف كبير، حرف صغير، رقم، ورمز خاص (!@#$%)، وطولها بين ٧ و٢٤ حرف.", type: 'error' });
+      }
+    setLoadingPassword(true);
+
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}user/${userId}/password`, {
         method: 'PUT',
@@ -168,9 +172,9 @@ const Profile = () => {
       setPasswordMessage({ text: 'تم تغيير كلمة المرور بنجاح!', type: 'success' });
     } catch (error) {
       console.error('Password change error:', error);
-      setPasswordMessage({ text: `خطأ: ${error.message}`, type: 'error' });
+      setPasswordMessage({ text:  error.message , type: 'error' });
     } finally {
-      setLoading(false);
+      setLoadingPassword(false);
     }
   };
 
@@ -249,6 +253,7 @@ const Profile = () => {
                       ))}
                     </select>
                   </div>
+                  {formErrors.specialty_id && <p className="text-red-500 text-sm mt-1">{formErrors.specialty_id}</p>}
                   {profileMessage.text && (
                     <div className={`p-4 rounded-xl text-sm font-medium ${profileMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                       {profileMessage.text}
@@ -306,7 +311,7 @@ const Profile = () => {
                     type="submit"
                     className="w-full py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 space-x-reverse disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading && <LoaderCircle className="w-5 h-5 animate-spin ml-2"/>}
+                    {loadingPass && <LoaderCircle className="w-5 h-5 animate-spin ml-2"/>}
                     <span>تغيير كلمة المرور</span>
                     <ChevronRight className="w-5 h-5"/>
                   </button>

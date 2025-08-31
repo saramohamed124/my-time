@@ -169,7 +169,7 @@ app.get('/user/:userId', async (req, res) => {
         }
         res.status(200).json(user);
     } catch (err) {
-        handleErrors(res, err);
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
 });
 
@@ -207,7 +207,7 @@ app.put('/user/:userId', async (req, res) => {
             const messages = Object.values(err.errors).map(val => val.message);
             return res.status(400).json({ message: 'Validation error', errors: messages });
         }
-        handleErrors(res, err);
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
 });
 
@@ -215,12 +215,17 @@ app.put('/user/:userId', async (req, res) => {
 // Example usage: PUT /api/users/12345/password
 app.put('/user/:userId/password', async (req, res) => {
     const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+        return res.status(400).json({ message: 'Old password and new password are required' });
+    }
     try {
         const user = await Users.findById(req.params.userId);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
+        if(!user.password){
+            return res.status(400).json({ message: ' لا يمكنك تغيير كلمة المرور لأن حسابك مرتبط بتسجيل الدخول عبر جوجل.' });
+        }
         // Validate the old password
         const isMatch = await bcrypt.compare(oldPassword, user.password);
         if (!isMatch) {
@@ -228,20 +233,23 @@ app.put('/user/:userId/password', async (req, res) => {
         }
 
         // Check if the new password meets the schema validation
-        const newUser = new User({ ...user.toObject(), password: newPassword });
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        console.log(hashedPassword);
+        const newUser = new Users({ ...user, password: hashedPassword });
         await newUser.validate(['password']);
 
         // Set the new password, the 'save' hook will hash it
-        user.password = newPassword;
+        user.password = hashedPassword;
         await user.save();
         
         res.status(200).json({ message: 'Password updated successfully' });
     } catch (err) {
+      console.log(err);
         if (err.name === 'ValidationError') {
             const messages = Object.values(err.errors).map(val => val.message);
             return res.status(400).json({ message: 'Validation error', errors: messages });
         }
-        handleErrors(res, err);
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
 });
 
