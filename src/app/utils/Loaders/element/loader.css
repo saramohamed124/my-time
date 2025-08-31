@@ -1,8 +1,11 @@
-#wifi-loader {
+#wifi-loader,
+.text-redirect {
   --background: #62abff;
   --front-color: #535ffd;
   --back-color: #c3c8de;
   --text-color: #414856;
+}
+#wifi-loader {
   width: 64px;
   height: 64px;
   border-radius: 50px;
@@ -11,7 +14,6 @@
   justify-content: center;
   align-items: center;
 }
-
 #wifi-loader svg {
   position: absolute;
   display: flex;
@@ -88,9 +90,10 @@
   animation: circle-inner162 1.8s ease infinite 0.05s;
 }
 
-#wifi-loader .text {
-  position: absolute;
-  bottom: -40px;
+.text-redirect .text {
+  position: relative;
+  bottom: -55px;
+  left: 71px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -99,17 +102,16 @@
   font-size: 14px;
   letter-spacing: 0.2px;
 }
-
-#wifi-loader .text::before,
-#wifi-loader .text::after {
+.text-redirect .text::before,
+.text-redirect .text::after {
   content: attr(data-text);
 }
 
-#wifi-loader .text::before {
+.text-redirect .text::before {
   color: var(--text-color);
 }
 
-#wifi-loader .text::after {
+.text-redirect .text::after {
   color: var(--front-color);
   animation: text-animation76 3.6s ease infinite;
   position: absolute;

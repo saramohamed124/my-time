@@ -175,7 +175,7 @@ const Profile = () => {
   };
 
   return (
-    <div className={`min-h-screen whitespace-nowrap flex flex-col items-center p-4 sm:p-8 transition-colors duration-300`} dir="rtl">
+    <div className={`min-h-screen flex flex-col items-center transition-colors duration-300`} dir="rtl">
       <div className="w-full max-w-5xl space-y-10">
         {loading && !userData ? (
           <div className="flex items-center justify-center min-h-[300px]">

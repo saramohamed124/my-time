@@ -18,7 +18,7 @@ export default function PublicRoute({ children }) {
 
     if (loading || user) {
         return (
-        <div className='flex justify-center items-center h-screen'>
+        <div className='flex justify-center items-center h-screen text-redirect'>
             <Loader />
             <div className="text" data-text="Redirecting..."></div>
         </div>
