@@ -152,6 +152,98 @@ app.post('/auth/login', async (req, res) => {
   }
 });
 
+// Users
+
+app.get('/user/:userId', async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        // Check if the userId is a valid MongoDB ObjectId
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID format' });
+        }
+
+        const user = await Users.findById(userId).select('-password -__v');
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json(user);
+    } catch (err) {
+        handleErrors(res, err);
+    }
+});
+
+// EDIT a user's profile (first name, last name, email, etc.)
+// Example usage: PUT /api/users/12345
+app.put('/user/:userId', async (req, res) => {
+    const { firstName, lastName, specialty_id, email, role } = req.body;
+    try {
+        const user = await Users.findById(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update fields if they are provided
+        if (firstName) user.firstName = firstName;
+        if (lastName) user.lastName = lastName;
+        if (specialty_id) user.specialty_id = specialty_id;
+        if (email) user.email = email;
+        if (role) user.role = role;
+
+        // Run Mongoose validation on the updated user object
+        await user.validate();
+
+        const updatedUser = await user.save();
+        res.status(200).json({
+            message: 'User profile updated successfully',
+            user: updatedUser.toObject({ getters: true, virtuals: false, transform: (doc, ret) => {
+                delete ret.password;
+                delete ret.__v;
+                return ret;
+            }})
+        });
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            const messages = Object.values(err.errors).map(val => val.message);
+            return res.status(400).json({ message: 'Validation error', errors: messages });
+        }
+        handleErrors(res, err);
+    }
+});
+
+// CHANGE a user's password
+// Example usage: PUT /api/users/12345/password
+app.put('/user/:userId/password', async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    try {
+        const user = await Users.findById(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Validate the old password
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid old password' });
+        }
+
+        // Check if the new password meets the schema validation
+        const newUser = new User({ ...user.toObject(), password: newPassword });
+        await newUser.validate(['password']);
+
+        // Set the new password, the 'save' hook will hash it
+        user.password = newPassword;
+        await user.save();
+        
+        res.status(200).json({ message: 'Password updated successfully' });
+    } catch (err) {
+        if (err.name === 'ValidationError') {
+            const messages = Object.values(err.errors).map(val => val.message);
+            return res.status(400).json({ message: 'Validation error', errors: messages });
+        }
+        handleErrors(res, err);
+    }
+});
 
 // CREATE a new task with level
 

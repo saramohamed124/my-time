@@ -6,6 +6,7 @@ import Sidebar from './components/Sidebar';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import Loader from '../utils/Loaders/element/Loader';
+import '../utils/Loaders/element/loader.css';
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function DashboardLayout({ children }) {
         return(
         <div className='flex justify-center items-center h-screen'>
             <Loader />
+            <div className="text" data-text="Redirecting..."></div>
         </div>
         )
     }
@@ -29,7 +31,7 @@ export default function DashboardLayout({ children }) {
       <Navbar />
       <section className="flex w-full">
         <Sidebar />
-        <main className=" w-full p-6 mx-auto ">
+        <main className=" w-full p-6 mx-auto  max-h-screen overflow-y-scroll">
           {children}
         </main>
       </section>

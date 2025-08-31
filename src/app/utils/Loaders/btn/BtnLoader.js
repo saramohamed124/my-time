@@ -1,8 +1,7 @@
-'use client';
 import React from 'react'
 
 // css
-import './btnLoader.css'
+import './btnloader.css'
 const BtnLoader = () => {
   return (
     <div className="lds-ellipsis">

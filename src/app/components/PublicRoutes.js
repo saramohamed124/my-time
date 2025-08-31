@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import Loader from '../utils/Loaders/element/Loader';
+import '../utils/Loaders/element/loader.css';
 
 export default function PublicRoute({ children }) {
     const { user, loading } = useAuth();
@@ -19,6 +20,7 @@ export default function PublicRoute({ children }) {
         return (
         <div className='flex justify-center items-center h-screen'>
             <Loader />
+            <div className="text" data-text="Redirecting..."></div>
         </div>
     )
     }
