@@ -15,7 +15,7 @@ const Code = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="2
 const GraduationCap = () => (<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M14 10a2 2 0 0 0-2 2v4a2 2 0 0 1-2 2h-2"/><path d="M14 14a2 2 0 0 1-2 2h-2a2 2 0 0 0-2 2v2"/><path d="M2 18v-2a2 2 0 0 1 2-2h2a2 2 0 0 0 2-2v-4a2 2 0 0 1 2-2h2a2 2 0 0 0 2-2V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4"/></svg>);
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
   const userId = user ? user._id  || user.id : null;
   const [userData, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -34,21 +34,23 @@ const Profile = () => {
     newPassword: '',
   });
 
-  // Hardcoded specialties for the dropdown menu
-  const specialties = [
-    { id: '1', name: "هندسة الميكاترونكس" },
-    { id: '2', name: "هندسة الميكانيكا"},
-    { id: '3', name: "هندسة طبية" },
-    { id: '4', name: "الهندسة المعمارية" },
-    { id: '5', name: "هندسة مدنية" },
-    { id: '6', name: "هندسة كيميائية" },
-    { id: '7', name: "هندسة كهربائية" },
-    { id: '8', name: "علوم الحاسب" },
-    { id: '9', name: "التسويق" },
-    { id: '10', name: "الموارد البشرية" },
-    { id: '11', name: "نظم المعلومات الإدارية"},
-    { id: '12', name: "المحاسبة"},
-  ];
+  const [specialties, setSpecialties] = useState([]);
+  useEffect(() => {
+    const fetchSpecialties = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}specialties`);
+        if (!response.ok) {
+          throw new Error('فشل في جلب التخصصات.');
+        }
+        const data = await response.json();
+        setSpecialties(data);
+      } catch (error) {
+        console.error('Fetch specialties error:', error);
+      }
+    };
+    fetchSpecialties();
+  }
+, []);
 
     // Validation function
     const validateForm = () => {
@@ -141,6 +143,9 @@ const Profile = () => {
         throw new Error(result.message || 'فشل في تحديث الملف الشخصي.');
       }
       setProfileMessage({ text: 'تم تحديث الملف الشخصي بنجاح!', type: 'success' });
+      login(result.user);
+      // Optionally, you can refetch user data to ensure it's up-to-date
+      fetchUser(userId);
     } catch (error) {
       console.error('Update error:', error);
       setProfileMessage({ text: `خطأ: ${error.message}`, type: 'error' });
@@ -170,6 +175,7 @@ const Profile = () => {
       }
       setPasswordData({ oldPassword: '', newPassword: '' });
       setPasswordMessage({ text: 'تم تغيير كلمة المرور بنجاح!', type: 'success' });
+    
     } catch (error) {
       console.error('Password change error:', error);
       setPasswordMessage({ text:  error.message , type: 'error' });
@@ -247,7 +253,7 @@ const Profile = () => {
                     >
                       <option value="" disabled>اختر تخصص</option>
                       {specialties.map((s) => (
-                        <option key={s.id} value={s.id}>
+                        <option key={s._id} value={s._id}>
                           {s.name}
                         </option>
                       ))}

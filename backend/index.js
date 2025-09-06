@@ -21,6 +21,7 @@ const path = require('path');
 const EngineeringDiscipline = require('./models/EngineeringDiscipline');
 const ComputerScienceField = require('./models/ComputerScienceField');
 const BusinessDiscipline = require('./models/BusinessDiscipline');
+const Specialties = require('./models/Specialties');
 
 
 
@@ -370,6 +371,26 @@ app.get('/business-specialties', async (req, res) => {
   }
 });
 
+// Specialties
+app.get('/specialties', async (req, res) => {
+  try {
+    const specialties = await Specialties.find();
+    res.status(200).json(specialties);
+  }catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء جلب التخصصات', error: err.message });
+  }
+});
+app.get('/specialties/:id', async (req, res) => {
+  try {
+    const specialty = await Specialties.findById(req.params.id);
+    if (!specialty) {
+      return res.status(404).json({ message: 'التخصص غير موجود' });
+    }
+    res.status(200).json(specialty);
+  }catch (err) {
+    res.status(500).json({ message: 'خطأ أثناء جلب التخصص', error: err.message });
+  }
+});
 // Start the server
 app.listen(process.env.PORT, () => {
   console.log("Server running on port 3050");

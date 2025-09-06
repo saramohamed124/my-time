@@ -1,4 +1,46 @@
-{
+const mongoose = require('mongoose');
+require("dotenv").config();
+
+// Define the schema for learning resources
+const youTubeResourceSchema = new mongoose.Schema({
+    channel: String,
+    language: String,
+    content: String
+});
+
+// Define the schema for the required skills object
+// We use 'mongoose.Schema.Types.Mixed' to handle the various key-value pairs
+// within the 'required_skills' object, as its structure changes.
+const requiredSkillsSchema = new mongoose.Schema({
+    languages: mongoose.Schema.Types.Mixed,
+    frameworks: mongoose.Schema.Types.Mixed,
+    databases: mongoose.Schema.Types.Mixed,
+    tools: mongoose.Schema.Types.Mixed,
+    networking: String,
+    operating_systems: String,
+    other_skills: String
+});
+
+// Define the schema for a single specialization within a field
+const specializationSchema = new mongoose.Schema({
+    specialization: String,
+    tasks: String,
+    required_skills: requiredSkillsSchema,
+    youtube_resources: [youTubeResourceSchema]
+});
+
+// Define the main schema for a computer science field
+const computerScienceFieldSchema = new mongoose.Schema({
+    field: String,
+    description: String,
+    specializations: [specializationSchema]
+});
+
+// Create the model from the main schema
+const ComputerScienceField = mongoose.model('ComputerScienceField', computerScienceFieldSchema);
+
+// The complete JSON data provided by the user
+const computerScienceData = {
     "discipline": "computer_science_fields",
     "fields": [
         {
@@ -232,3 +274,35 @@
         }
     ]
 }
+
+// Function to seed the database with the JSON data
+const seedDB = async () => {
+    try {
+        // Connect to MongoDB
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log('Connected to MongoDB!');
+
+        // Clear the collection first to prevent duplicate entries
+        await ComputerScienceField.deleteMany({});
+        console.log('Previous data cleared.');
+
+        // Insert the data from the JSON object
+        // The original code was trying to access `computerScienceData.computer_science_fields`
+        // which does not exist. The correct key is `fields`.
+        for (const field of computerScienceData.fields) {
+            await ComputerScienceField.create(field);
+            console.log(`Document for field '${field.field}' created successfully.`);
+        }
+
+        console.log('Database seeded successfully!');
+    } catch (err) {
+        console.error('Error seeding the database:', err);
+    } finally {
+        // Close the connection
+        await mongoose.disconnect();
+        console.log('MongoDB connection closed.');
+    }
+};
+
+// Run the seeding function
+seedDB();
