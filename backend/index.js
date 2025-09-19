@@ -22,7 +22,7 @@ const EngineeringDiscipline = require('./models/EngineeringDiscipline');
 const ComputerScienceField = require('./models/ComputerScienceField');
 const BusinessDiscipline = require('./models/BusinessDiscipline');
 const Specialties = require('./models/Specialties');
-
+const Missions = require('./models/Missions');
 
 
 
@@ -257,8 +257,78 @@ app.put('/user/:userId/password', async (req, res) => {
     }
 });
 
-// CREATE a new task with level
+// Missions
+app.get('/missions', async (req, res) => {
+  try {
+    const missions = await Missions.find({});
+    res.json(missions);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
 
+// POST endpoint to create a new mission
+app.post('/missions', async (req, res) => {
+  try {
+    // Create a new mission instance from the request body
+    const newMission = new Missions(req.body);
+    await newMission.save();
+    res.status(201).json(newMission);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// PUT endpoint to update an existing mission
+app.put('/missions/:id', async (req, res) => {
+    try {
+        const mission = await Missions.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!mission) {
+            return res.status(404).json({ message: 'Mission not found' });
+        }
+        res.json(mission);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// PATCH endpoint to update the status of a mission
+app.patch('/missions/:id/status', async (req, res) => {
+    try {
+        const { status } = req.body;
+        const validStatuses = ['pending', 'in-progress', 'completed'];
+
+        if (!status || !validStatuses.includes(status)) {
+            return res.status(400).json({ message: 'Invalid status provided' });
+        }
+
+        const mission = await Missions.findByIdAndUpdate(
+            req.params.id,
+            { status: status },
+            { new: true }
+        );
+
+        if (!mission) {
+            return res.status(404).json({ message: 'Mission not found' });
+        }
+        res.json(mission);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+app.delete('/missions/:id', async (req, res) => {
+    try {
+        const mission = await Missions.findByIdAndDelete(req.params.id);
+        if (!mission) {
+            return res.status(404).json({ message: 'Mission not found' });
+        }
+        res.json({ message: 'Mission deleted successfully' });
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+// CREATE a new task with level
 
 // GET all tasks
 // CREATE a new task with userId (user-specific)

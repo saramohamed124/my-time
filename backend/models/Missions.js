@@ -24,6 +24,22 @@ const MissionSchema = new Schema({
         enum :['pending', 'in-progress', 'completed'],
         default: 'pending',
     },
+    type: {
+        type: String,
+        enum: ['exam', 'interview', 'project', 'study', 'work'],
+        default: 'study', // default type
+        required: true,
+    },
+    priority: {
+        type: String,
+        enum: ['low', 'medium', 'high'],
+        default: 'medium',
+    },
+    difficulty: {
+        type: String,
+        enum: ['easy', 'medium', 'hard'],
+        default: 'medium',
+    },
     tasks:[{
         type: Schema.Types.ObjectId,
         ref: 'Tasks',
