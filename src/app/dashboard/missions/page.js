@@ -72,7 +72,7 @@ export default function Missions() {
 
   return (
     <div className="min-h-screen p-8">
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex justify-between items-center mb-8 flex-col gap-5 md:flex-row">
         <h1 className="text-3xl font-bold">المهام</h1>
         <button
           onClick={() => setIsModalOpen(true)}

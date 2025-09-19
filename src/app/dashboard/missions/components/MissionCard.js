@@ -87,7 +87,7 @@ const MissionCard = ({ mission, onUpdateStatus, onDelete, onEdit }) => {
             <p className="text-sm text-gray-500 mt-2">
                 تاريخ الانتهاء: {new Date(mission.end_date).toLocaleDateString('ar-EG')}
             </p>
-            <div className="mt-4 flex justify-end space-x-2">
+            <div className="mt-4 flex justify-center items-center gap-2 space-x-2 flex-wrap">
                 <button
                     onClick={() => onEdit(mission)}
                     className="px-4 py-2 text-white bg-gray-500 rounded-lg"
