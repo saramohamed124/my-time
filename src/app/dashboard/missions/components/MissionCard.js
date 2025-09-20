@@ -1,4 +1,8 @@
 import React from 'react';
+import Image from 'next/image';
+
+// icons
+import edit_icon from '../assets/edit.png'
 
 const MissionCard = ({ mission, onUpdateStatus, onDelete, onEdit }) => {
     const getStatusColor = (status) => {
@@ -68,7 +72,7 @@ const MissionCard = ({ mission, onUpdateStatus, onDelete, onEdit }) => {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 border-t-4 border-solid border-blue-500">
+        <div className="relative bg-white rounded-lg shadow-md p-6 border-t-4 border-solid border-blue-500">
             <div className="flex justify-between items-start">
                 <h3 className={`text-xl font-bold ${mission.status === 'completed' && 'line-through'}`}>{mission.title}</h3>
                 <span className={`w-3 h-3 rounded-full ${getStatusColor(mission.status)}`}></span>
@@ -77,11 +81,11 @@ const MissionCard = ({ mission, onUpdateStatus, onDelete, onEdit }) => {
             <div className="mt-4 flex justify-between items-center">
                 <span className="bg-blue-100 px-2 py-1 rounded-full flex items-center space-x-1">
                     {getTypeIcon(mission.type)}
-                    <span className="text-blue-800 text-xs font-semibold">{mission.type}</span>
+                    <span className="text-blue-800 text-xs font-semibold">{mission.type === 'study' ? 'مذاكرة' : mission.type === 'exam' ? 'امتحان' : mission.type === 'interview' ? 'مقابلة عمل' : mission.type === 'project' ? 'مشروع' : 'عمل'}</span>
                 </span>
                 <span className="flex items-center space-x-1">
                     {getDifficultyIcons(mission.difficulty)}
-                    {mission.difficulty ? <span className="text-gray-600 text-sm">{mission.difficulty}</span> : null}
+                    {mission.difficulty ? <span className="text-gray-600 text-sm">{mission.difficulty === "easy" ? 'سهل' : mission.difficulty === "medium" ? 'متوسط' : 'صعب' }</span> : null}
                 </span>
             </div>
             <p className="text-sm text-gray-500 mt-2">
@@ -90,9 +94,9 @@ const MissionCard = ({ mission, onUpdateStatus, onDelete, onEdit }) => {
             <div className="mt-4 flex justify-center items-center gap-2 space-x-2 flex-wrap">
                 <button
                     onClick={() => onEdit(mission)}
-                    className="px-4 py-2 text-white bg-gray-500 rounded-lg"
+                    className="absolute top-1 right-2"
                 >
-                    تعديل
+                    <Image src={edit_icon} alt="Edit" className="w-5 h-5 hover:opacity-70" />
                 </button>
                 <button
                     onClick={() => onUpdateStatus(mission._id, 'in-progress')}
@@ -108,9 +112,9 @@ const MissionCard = ({ mission, onUpdateStatus, onDelete, onEdit }) => {
                 </button>
                 <button
                     onClick={() => onDelete(mission._id)}
-                    className="px-4 py-2 text-white bg-red-500 rounded-lg"
+                    className="absolute top-[-20px] left-[-15px] px-4 py-2 text-white bg-red-500 rounded-[50%]"
                 >
-                    حذف
+                    X
                 </button>
             </div>
         </div>
