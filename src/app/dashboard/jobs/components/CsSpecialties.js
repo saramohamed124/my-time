@@ -29,10 +29,10 @@ const csFields = careerData.find(field => field.field === specName);
 const csSpecializations = csFields ? csFields.specializations : [];
 
     return (
-        <div className="font-sans text-right bg-slate-50 p-4 sm:p-8" dir="rtl">
+        <div className="font-sans text-right bg-slate-50 " dir="rtl">
 
                 <div className="grid grid-cols-1 gap-8">
-                        <div key={careerData.field} className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl transition-all duration-500 ease-in-out transform hover:scale-[1.01] border border-slate-200">
+                        <div key={careerData.field} className="bg-white rounded-3xl p-2 sm:p-4 shadow-2xl transition-all duration-500 ease-in-out transform hover:scale-[1.01] border border-slate-200">
                             <div className="space-y-8">
                                 {csSpecializations.map((spec, specIndex) => {
                                     const specializationId = `${specIndex}`;

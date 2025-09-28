@@ -5,7 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const Users = require('./models/Users');
 const app = express();
-const Todo = require('./models/Todo');
+const Tasks = require('./models/Tasks');
 
 const corsOptions = {
   origin: ['http://localhost:3000', 'https://my-time-hazel.vercel.app'],
@@ -331,88 +331,108 @@ app.delete('/missions/:id', async (req, res) => {
 // CREATE a new task with level
 
 // GET all tasks
-// CREATE a new task with userId (user-specific)
-app.post('/todos', async (req, res) => {
-  const { title, description, type, level, userId } = req.body;
+app.get('/tasks', async (req, res) => {
+    try {
+        const tasks = await Tasks.find();
+        res.json(tasks);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
-  if (!title || !description || !type || !level || !userId) {
-    return res.status(400).json({ message: 'الرجاء ملء جميع الحقول المطلوبة' });
-  }
+// GET a single task by ID
+app.get('/task/:id', async (req, res) => {
+    try {
+        const task = await Tasks.findById(req.params.id);
+        if (task == null) {
+            return res.status(404).json({ message: 'Tasks not found' });
+        }
+        res.json(task);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
-  try {
-    const todo = new Todo({
-      title,
-      description,
-      type,
-      level,
-      userId,  // Associate the task with the user
+// POST a new task
+app.post('/tasks', async (req, res) => {
+    const { title, description, due_date, difficulty_level, priority, status, mission_id } = req.body;
+    const task = new Tasks({
+        title,
+        description,
+        due_date,
+        difficulty_level,
+        priority,
+        status,
+        mission_id
     });
-    await todo.save();
-    res.status(201).json({ message: 'تم إنشاء المهمة بنجاح', todo });
-  } catch (err) {
-    res.status(500).json({ message: 'خطأ أثناء إنشاء المهمة', error: err.message });
-  }
-});
-// GET tasks by user ID
-app.get('/todos/user/:userId', async (req, res) => {
-  try {
-    const todos = await Todo.find({ userId: req.params.userId }); // Filter by userId
-    res.status(200).json(todos);
-  } catch (err) {
-    res.status(500).json({ message: 'خطأ أثناء جلب المهام', error: err.message });
-  }
-});
 
-// GET task by ID
-app.get('/todos/:id', async (req, res) => {
-  try {
-    const todo = await Todo.findById(req.params.id);
-    if (!todo) {
-      return res.status(404).json({ message: 'المهمة غير موجودة' });
+    try {
+        const newTask = await task.save();
+        res.status(201).json(newTask);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
     }
-    res.status(200).json(todo);
-  } catch (err) {
-    res.status(500).json({ message: 'خطأ أثناء جلب المهمة', error: err.message });
-  }
 });
 
-// UPDATE a task with level
-app.put('/todos/:id', async (req, res) => {
-  const { title, description, type, level, completed } = req.body;
-
-  if (!title || !description || !type || !level) {
-    return res.status(400).json({ message: 'الرجاء ملء جميع الحقول المطلوبة' });
-  }
-
-  try {
-    const todo = await Todo.findByIdAndUpdate(
-      req.params.id,
-      { title, description, type, level, completed },
-      { new: true }
-    );
-
-    if (!todo) {
-      return res.status(404).json({ message: 'المهمة غير موجودة' });
+// PUT to update a task's information (all fields)
+app.put('/tasks/:id', async (req, res) => {
+    try {
+        const updatedTask = await Tasks.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedTask) {
+            return res.status(404).json({ message: 'Tasks not found' });
+        }
+        res.json(updatedTask);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
     }
-    res.status(200).json({ message: 'تم تحديث المهمة بنجاح', todo });
-  } catch (err) {
-    res.status(500).json({ message: 'خطأ أثناء تحديث المهمة', error: err.message });
-  }
+});
+
+// PUT to update a task's status
+app.put('/tasks/:id/status', async (req, res) => {
+    const { status } = req.body;
+    if (!status || !['pending', 'in-progress', 'completed'].includes(status)) {
+        return res.status(400).json({ message: 'Invalid status provided' });
+    }
+    try {
+        const updatedTask = await Tasks.findByIdAndUpdate(req.params.id, { status }, { new: true });
+        if (!updatedTask) {
+            return res.status(404).json({ message: 'Tasks not found' });
+        }
+        res.json(updatedTask);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
+});
+
+// PUT to update a task's priority
+app.put('/tasks/:id/priority', async (req, res) => {
+    const { priority } = req.body;
+    if (!priority || !['low', 'medium', 'high'].includes(priority)) {
+        return res.status(400).json({ message: 'Invalid priority provided' });
+    }
+    try {
+        const updatedTask = await Tasks.findByIdAndUpdate(req.params.id, { priority }, { new: true });
+        if (!updatedTask) {
+            return res.status(404).json({ message: 'Tasks not found' });
+        }
+        res.json(updatedTask);
+    } catch (err) {
+        res.status(400).json({ message: err.message });
+    }
 });
 
 // DELETE a task
-app.delete('/todos/:id', async (req, res) => {
-  try {
-    const todo = await Todo.findByIdAndDelete(req.params.id);
-    if (!todo) {
-      return res.status(404).json({ message: 'المهمة غير موجودة' });
+app.delete('/tasks/:id', async (req, res) => {
+    try {
+        const task = await Tasks.findByIdAndDelete(req.params.id);
+        if (!task) {
+            return res.status(404).json({ message: 'Tasks not found' });
+        }
+        res.json({ message: 'Tasks deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-    res.status(200).json({ message: 'تم حذف المهمة بنجاح' });
-  } catch (err) {
-    res.status(500).json({ message: 'خطأ أثناء حذف المهمة', error: err.message });
-  }
 });
-
 // Jobs & Specialties
 app.get('/engineering-specialties', async (req, res) => {
   try {

@@ -25,11 +25,26 @@ const TaskSchema = new Schema({
         enum :['pending', 'in-progress', 'completed'],
         default: 'pending',
     },
+        due_date: {
+        type: Date,
+        required: true,
+    },
+    priority: {
+        type: String,
+        enum: ['low', 'medium', 'high'],
+        default: 'medium',
+        required: true,
+    },
     mission_id:{
         type: Schema.Types.ObjectId,
         ref: 'Missions',
         required: true
-    }
+    },
+      createdAt: {
+    type: Date,
+    default: Date.now
+  },
+
 });
 
 const Task = mongoose.model('Task', TaskSchema);

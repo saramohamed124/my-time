@@ -1,11 +1,11 @@
 'use client';
 
 import { configureStore } from '@reduxjs/toolkit';
-import { todoReducer } from '@/lib/features/todos/todoSlice';
+import {tasksReducer} from './features/todos/todoSlice';
 
 const store = configureStore({
   reducer: {
-    todos: todoReducer, // Add the todos reducer here
+    tasks: tasksReducer, // Add the todos reducer here
   },
 });
 
