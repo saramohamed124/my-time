@@ -93,8 +93,8 @@ const MissionModal = ({ onClose, mission }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-gray-600/50 bg-opacity-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-xl">
+        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-xl max-h-full overflow-y-scroll">
                 <h2 className="text-2xl font-bold mb-4 text-right">
                     {isEditing ? 'تعديل مهمة' : 'إنشاء مهمة جديدة'}
                 </h2>

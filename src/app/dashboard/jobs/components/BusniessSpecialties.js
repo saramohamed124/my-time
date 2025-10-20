@@ -51,8 +51,8 @@ const BusniessSpecialties = ({spec, openSpecializationId, handleToggle}) => {
                                 }[key];
                                 return (
                                   <div key={key}>
-                                    <p className="font-bold text-slate-900">{label}:</p>
-                                    <p className="mt-1 text-slate-600">{value}</p>
+                                    <p className="font-bold text-slate-900">{label && `${label} : `}</p>
+                                    <p className="mt-1 text-slate-600">{label && value}</p>
                                   </div>
                                 );
                               }

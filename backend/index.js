@@ -355,13 +355,16 @@ app.get('/task/:id', async (req, res) => {
 
 // POST a new task
 app.post('/tasks', async (req, res) => {
-    const { title, description, due_date, difficulty_level, priority, status, mission_id } = req.body;
+
+    const { title, description, due_date, difficulty_level, priority, type,icon, status, mission_id } = req.body;
     const task = new Tasks({
         title,
         description,
         due_date,
         difficulty_level,
         priority,
+        type,
+        icon,
         status,
         mission_id
     });

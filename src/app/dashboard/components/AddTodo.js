@@ -26,7 +26,7 @@ const AddTodo = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md max-h-full overflow-y-scroll">
       <h2 className="text-2xl font-semibold text-gray-700 mb-4">إضافة مهمة جديدة</h2>
       <div className="mb-4">
         <label htmlFor="title" className="block text-sm font-medium text-gray-600 mb-2">

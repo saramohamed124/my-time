@@ -35,6 +35,15 @@ const TaskSchema = new Schema({
         default: 'medium',
         required: true,
     },
+     type: { 
+        type: String,
+        enum: ['study', 'soft_skills', 'mental_break', 'physical', 'review', 'other'], // Extended enum for clarity
+        required: true,
+    },
+    icon: { 
+        type: String, 
+        trim: true,
+    },
     mission_id:{
         type: Schema.Types.ObjectId,
         ref: 'Missions',

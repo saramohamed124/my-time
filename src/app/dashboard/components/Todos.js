@@ -16,6 +16,7 @@ import {
 const STATUS_OPTIONS = ['pending', 'in-progress', 'completed'];
 const PRIORITY_OPTIONS = ['low', 'medium', 'high'];
 const DIFFICULTY_LEVELS = ['easy', 'intermediate', 'hard'];
+const TASK_TYPES = ['study', 'soft_skills', 'mental_break', 'physical', 'review', 'other'];
 
 // Function to map priority to a color for the flag icon
 const getPriorityColor = (priority) => {
@@ -40,7 +41,6 @@ const Tasks = () => {
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
-    // due_date here represents estimated hours
     due_date: '',
     difficulty_level: '',
     priority: '',
@@ -127,6 +127,7 @@ const Tasks = () => {
         description: '',
         due_date: '',
         difficulty_level: '',
+        type: '',
         priority: '',
         status: 'pending',
         mission_id: ''
@@ -184,6 +185,7 @@ const Tasks = () => {
       due_date: '',
       difficulty_level: '',
       priority: '',
+      type: '',
       status: 'pending',
       mission_id: ''
     });
@@ -448,7 +450,7 @@ const Tasks = () => {
           }}
           tabIndex={-1} // Makes the div focusable for onKeyDown to work
         >
-          <div className="bg-white p-6 sm:p-8 rounded-xl w-full max-w-lg shadow-2xl relative text-right transform transition-all scale-100" dir="rtl">
+          <div className="bg-white p-6 sm:p-8 rounded-xl w-full max-w-lg shadow-2xl relative text-right transform transition-all scale-100 max-h-full overflow-y-scroll" dir="rtl">
             <button
               onClick={() => setShowModal(false)}
               className="absolute top-3 left-3 text-gray-400 hover:text-gray-700 text-3xl transition-colors p-2"
@@ -523,6 +525,20 @@ const Tasks = () => {
                     <option value="">اختر الأولوية</option>
                     {PRIORITY_OPTIONS.map((p) => (
                       <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="task_type" className="block text-sm font-medium text-gray-700 mb-1">نوع التاسك</label>
+                  <select
+                    id="type"
+                    value={editingTask ? editingTask.task_type : newTask.task_type}
+                    onChange={(e) => handleInputChange(e, !!editingTask)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+                  >
+                    <option value="">اختر نوع التاسك (اختياري)</option>
+                    {TASK_TYPES.map((type) => (
+                      <option key={type} value={type}>{type}</option>
                     ))}
                   </select>
                 </div>
