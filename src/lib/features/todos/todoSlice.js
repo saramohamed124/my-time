@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 export const fetchMissions = createAsyncThunk('missions/fetchMissions', async () => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}missions`);
   if (!response.ok) {
-    throw new Error('فشل في تحميل المهام.');
+    throw new Error('فشل في تحميل الأهداف.');
   }
   return await response.json();
 });
@@ -12,7 +12,7 @@ export const fetchMissions = createAsyncThunk('missions/fetchMissions', async ()
 export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}tasks`);
   if (!response.ok) {
-    throw new Error('فشل في تحميل المهام.');
+    throw new Error('فشل في تحميل الأهداف.');
   }
   return await response.json();
 });

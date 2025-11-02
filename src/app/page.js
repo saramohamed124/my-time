@@ -10,9 +10,9 @@ export default function Home() {
     <Navbar />
     <article className="bg-[linear-gradient(to_bottom,_#CACDFE_15%,_#cacdfe82_55%,_#cacdfe2b_65%)] mx-0">
       <section className="text-center p-8 flex justify-center flex-col items-center gap-2">
-        <h1 className="text-3xl text-black font-bold mb-4 w-[90%] md:w-[24rem]">إدارة احترافية للمهام والوقت، بين يديك</h1>
+        <h1 className="text-3xl text-black font-bold mb-4 w-[90%] md:w-[24rem]">إدارة احترافية للأهداف والوقت، بين يديك</h1>
         <p className="text-[#757575] w-[90%] md:w-2xl">
-        "موقع "وقتي" هو الحل المثالي لتنظيم وإدارة مهامك اليومية بشكل فعال. يساعدك في ترتيب أولوياتك وتحقيق أهدافك بكل سهولة. مع أدواتنا المتقدمة، أصبح إدارة الوقت أكثر سهولة واحترافية.        </p>
+        "موقع "وقتي" هو الحل المثالي لتنظيم وإدارة أهدافك اليومية بشكل فعال. يساعدك في ترتيب أولوياتك وتحقيق أهدافك بكل سهولة. مع أدواتنا المتقدمة، أصبح إدارة الوقت أكثر سهولة واحترافية.        </p>
       <Link className="bg-[#535FFD] text-white text-2xl px-8 py-2 rounded my-4" href='/signup'>ابدأ الآن</Link>
       </section>
       

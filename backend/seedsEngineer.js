@@ -87,7 +87,7 @@ const engineeringData = {
                 },
                 {
                     "job_title": "مهندس روبوتات (Robotics Engineer)",
-                    "responsibilities": "يُصمم الروبوتات، ويبرمجها، ويطورها لتنفيذ مهام محددة بدقة.",
+                    "responsibilities": "يُصمم الروبوتات، ويبرمجها، ويطورها لتنفيذ أهداف محددة بدقة.",
                     "skills_and_tools": {
                         "core_skills": {
                             "برمجة": [

@@ -18,7 +18,7 @@ export default function Missions() {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}missions`);
       if (!res.ok) {
-        throw new Error('فشل جلب المهام');
+        throw new Error('فشل جلب الأهداف');
       }
       const data = await res.json();
       setMissions(data);
@@ -73,12 +73,12 @@ export default function Missions() {
   return (
     <div className="min-h-screen p-8">
       <header className="flex justify-between items-center mb-8 flex-col gap-5 md:flex-row">
-        <h1 className="text-3xl font-bold">المهام</h1>
+        <h1 className="text-3xl font-bold">الأهداف</h1>
         <button
           onClick={() => setIsModalOpen(true)}
           className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700"
         >
-          + إضافة مهمة
+          + إضافة هدف
         </button>
       </header>
 
@@ -90,7 +90,7 @@ export default function Missions() {
         )}
         {error && <div className="text-red-500 col-span-full">{error}</div>}
         {!isLoading && missions.length === 0 ? (
-          <p className='text-xl text-gray-400'>لا توجد مهام متاحة. أضف مهمة جديدة.</p>
+          <p className='text-xl text-gray-400'>لا توجد أهداف متاحة. أضف هدف جديدة.</p>
         ) : (
           missions.map((mission) => (
             <MissionCard

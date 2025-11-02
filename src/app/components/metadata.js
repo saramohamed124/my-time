@@ -1,4 +1,4 @@
 export const metadata = {
   title: "وقتي",
-  description: "تابع مهامك، أنجز أهدافك",
+  description: "تابع أهدافك، أنجز أهدافك",
 };

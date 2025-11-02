@@ -115,7 +115,7 @@ export default function SignupForm() {
       </header>
 
       <main className="mx-0 p-6 bg-[#1D2159] text-white shadow-lg rounded-none md:rounded space-y-6 mb-0">
-        <h2 className="text-2xl font-bold text-center">جاهز تنجز مهامك بسهولة؟</h2>
+        <h2 className="text-2xl font-bold text-center">جاهز تنجز أهدافك بسهولة؟</h2>
         <p className="text-sm text-center">أنشئ حسابك الآن وابدأ رحلتك نحو إنتاجية أعلى.</p>
         <form onSubmit={handleSubmit} className="space-y-4 ">
           {/* First Name Field */}

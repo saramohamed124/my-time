@@ -83,10 +83,10 @@ const Tasks = () => {
   // --- Input Validation Logic ---
   const validateForm = (taskData) => {
     if (!taskData.title.trim()) {
-      return 'الرجاء إدخال عنوان التاسك.';
+      return 'الرجاء إدخال عنوان المهمة.';
     }
     if (!taskData.description.trim()) {
-      return 'الرجاء إدخال وصف التاسك.';
+      return 'الرجاء إدخال وصف المهمة.';
     }
     // Regex: check for valid selection
     if (!taskData.mission_id || taskData.mission_id === '') {
@@ -205,7 +205,7 @@ const Tasks = () => {
     <article className="p-4 sm:p-6 bg-gray-50 min-h-screen font-sans text-right" dir="rtl">
       {/* Header & Add Task Button */}
       <section className="flex flex-wrap w-full justify-between my-3 gap-4 items-center pb-4">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">قائمة التاسكات</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">قائمة المهام</h1>
         <div className="text-center">
           <button
             onClick={openAddModal}
@@ -216,7 +216,7 @@ const Tasks = () => {
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            إضافة تاسك جديدة
+            إضافة مهمة جديدة
           </button>
         </div>
       </section>
@@ -230,7 +230,7 @@ const Tasks = () => {
           onChange={(e) => setFilterMission(e.target.value)}
           className="p-3 w-full sm:max-w-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
         >
-          <option value="all">جميع المهام</option>
+          <option value="all">جميع الأهداف</option>
           {missions?.map((mission) => (
             <option key={mission._id} value={mission._id}>{mission.title}</option>
           ))}
@@ -241,11 +241,11 @@ const Tasks = () => {
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-t-indigo-500">
           <p className="text-4xl font-extrabold text-gray-800">{pendingCount}</p>
-          <p className="text-sm text-gray-500 mt-1">التاسكات المعلقة</p>
+          <p className="text-sm text-gray-500 mt-1">المهام المعلقة</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-t-green-500">
           <p className="text-4xl font-extrabold text-gray-800">{completedCount}</p>
-          <p className="text-sm text-gray-500 mt-1">التاسكات المكتملة</p>
+          <p className="text-sm text-gray-500 mt-1">المهام المكتملة</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow-lg border-t-4 border-t-blue-500">
           <p className="text-4xl font-extrabold text-gray-800">{totalHours}h</p>
@@ -265,7 +265,7 @@ const Tasks = () => {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
               </svg>
-              التاسكات المعلقة ({pendingTasks.length})
+              المهام المعلقة ({pendingTasks.length})
             </h2>
             {pendingTasks.length > 0 ? (
               <ul className="space-y-4">
@@ -342,7 +342,7 @@ const Tasks = () => {
                 ))}
               </ul>
             ) : (
-              <p className="text-lg text-gray-500 text-center mt-4 p-8 bg-white rounded-xl shadow-inner">لا توجد تاسكات معلقة حاليًا في هذه المهمة.</p>
+              <p className="text-lg text-gray-500 text-center mt-4 p-8 bg-white rounded-xl shadow-inner">لا توجد مهام معلقة حاليًا في هذه المهمة.</p>
             )}
           </div>
 
@@ -353,7 +353,7 @@ const Tasks = () => {
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
-              التاسكات المكتملة ({completedTasks.length})
+              المهام المكتملة ({completedTasks.length})
             </h2>
             {completedTasks.length > 0 ? (
               <ul className="space-y-4">
@@ -430,7 +430,7 @@ const Tasks = () => {
                 ))}
               </ul>
             ) : (
-              <p className="text-lg text-gray-500 text-center mt-4 p-8 bg-white rounded-xl shadow-inner">لا توجد تاسكات مكتملة في هذه المهمة.</p>
+              <p className="text-lg text-gray-500 text-center mt-4 p-8 bg-white rounded-xl shadow-inner">لا توجد مهام مكتملة في هذه المهمة.</p>
             )}
           </div>
         </section>
@@ -460,7 +460,7 @@ const Tasks = () => {
             </button>
 
             <h2 className="text-2xl font-extrabold mb-6 text-center text-gray-800 pb-3">
-              {editingTask ? 'تعديل بيانات التاسك' : 'إنشاء تاسك جديدة'}
+              {editingTask ? 'تعديل بيانات المهمة' : 'إنشاء مهمة جديدة'}
             </h2>
 
             {formError && (
@@ -487,7 +487,7 @@ const Tasks = () => {
 
               {/* Task Title */}
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">عنوان التاسك <span className="text-red-500">*</span></label>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">عنوان المهمة <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   id="title"
@@ -500,7 +500,7 @@ const Tasks = () => {
 
               {/* Description */}
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">وصف التاسك <span className="text-red-500">*</span></label>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">وصف المهمة <span className="text-red-500">*</span></label>
                 <textarea
                   required
                   id="description"
@@ -529,14 +529,14 @@ const Tasks = () => {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="task_type" className="block text-sm font-medium text-gray-700 mb-1">نوع التاسك</label>
+                  <label htmlFor="task_type" className="block text-sm font-medium text-gray-700 mb-1">نوع المهمة</label>
                   <select
                     id="type"
                     value={editingTask ? editingTask.task_type : newTask.task_type}
                     onChange={(e) => handleInputChange(e, !!editingTask)}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
                   >
-                    <option value="">اختر نوع التاسك (اختياري)</option>
+                    <option value="">اختر نوع المهمة (اختياري)</option>
                     {TASK_TYPES.map((type) => (
                       <option key={type} value={type}>{type}</option>
                     ))}
@@ -599,7 +599,7 @@ const Tasks = () => {
                 type="submit"
                 className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-lg font-semibold text-lg"
               >
-                {editingTask ? 'حفظ التعديلات' : 'إنشاء التاسك'}
+                {editingTask ? 'حفظ التعديلات' : 'إنشاء المهمة'}
               </button>
             </form>
           </div>

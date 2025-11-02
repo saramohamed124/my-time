@@ -80,13 +80,13 @@ const MissionModal = ({ onClose, mission }) => {
             });
 
             if (!response.ok) {
-                throw new Error('فشل في حفظ المهمة');
+                throw new Error('فشل في حفظ الهدف');
             }
 
             onClose();
         } catch (error) {
             console.error(error);
-            setError('حدث خطأ أثناء حفظ المهمة. الرجاء المحاولة مرة أخرى.');
+            setError('حدث خطأ أثناء حفظ الهدف. الرجاء المحاولة مرة أخرى.');
         } finally {
             setIsLoading(false);
         }
@@ -96,11 +96,11 @@ const MissionModal = ({ onClose, mission }) => {
         <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg p-8 w-full max-w-md shadow-xl max-h-full overflow-y-scroll">
                 <h2 className="text-2xl font-bold mb-4 text-right">
-                    {isEditing ? 'تعديل مهمة' : 'إنشاء مهمة جديدة'}
+                    {isEditing ? 'تعديل هدف' : 'إنشاء هدف جديدة'}
                 </h2>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-right">عنوان المهمة</label>
+                        <label className="block text-gray-700 text-right">عنوان الهدف</label>
                         <input
                             type="text"
                             name="title"
@@ -139,7 +139,7 @@ const MissionModal = ({ onClose, mission }) => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-gray-700 text-right">نوع المهمة</label>
+                        <label className="block text-gray-700 text-right">نوع الهدف</label>
                         <select
                             name="type"
                             value={formData.type}
@@ -184,7 +184,7 @@ const MissionModal = ({ onClose, mission }) => {
                             className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400"
                             disabled={isLoading}
                         >
-                            {isLoading ? 'جارٍ الحفظ...' : 'حفظ المهمة'}
+                            {isLoading ? 'جارٍ الحفظ...' : 'حفظ الهدف'}
                         </button>
                     </div>
                 </form>

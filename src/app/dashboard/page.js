@@ -13,11 +13,11 @@ const TIREDNESS_LEVELS = [
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/'}`; 
 
 /**
- * الخوارزمية المحسّنة لاقتراح المهام بناءً على مستوى التعب المُقاس (نطاق 0-5).
+ * الخوارزمية المحسّنة لاقتراح الأهداف بناءً على مستوى التعب المُقاس (نطاق 0-5).
  * تم تعديل حدود النقاط لتناسب النطاق الفعلي المُرسل من الواجهة.
  * * @param {number} tirednessScore - نقاط التعب المُقاسة (0-5).
- * @param {Array<Object>} allTasks - قائمة بكل المهام المتاحة.
- * @returns {Array<Object>} - قائمة بثلاث مهام مقترحة كحد أقصى.
+ * @param {Array<Object>} allTasks - قائمة بكل الأهداف المتاحة.
+ * @returns {Array<Object>} - قائمة بثلاث أهداف مقترحة كحد أقصى.
  */
 const getSuggestedTasks = (tirednessScore, allTasks) => {
     // 1. التحقق من صحة المدخلات
@@ -30,7 +30,7 @@ const getSuggestedTasks = (tirednessScore, allTasks) => {
     let requiredDifficulty = [];
     let preferredTypes = [];
 
-    // 2. تعريف متطلبات المهام بناءً على مستوى التعب (النطاق المُصحح: 0-5)
+    // 2. تعريف متطلبات الأهداف بناءً على مستوى التعب (النطاق المُصحح: 0-5)
     
     // التعب المنخفض: 0 أو 1 (طاقة عالية)
     if (tirednessScore <= 1) { 
@@ -53,21 +53,21 @@ const getSuggestedTasks = (tirednessScore, allTasks) => {
 
     // 3. استراتيجية التصفية (لضمان 3 اقتراحات فريدة)
 
-    // Strategy A: المطابقة القوية - مهام تطابق الصعوبة المطلوبة والنوع المُفضل
+    // Strategy A: المطابقة القوية - أهداف تطابق الصعوبة المطلوبة والنوع المُفضل
     const typeMatches = allTasks.filter(task =>
         requiredDifficulty.includes(task.difficulty_level) &&
         preferredTypes.includes(task.type) &&
-        task.status !== 'completed' // لا تقترح المهام المكتملة
+        task.status !== 'completed' // لا تقترح الأهداف المكتملة
     ).slice(0, 2); // نأخذ ما يصل إلى مهمتين
 
     suggestions.push(...typeMatches);
 
-    // Strategy B: ملء الفراغ - مهام تطابق الصعوبة المطلوبة فقط (للتنويع)
+    // Strategy B: ملء الفراغ - أهداف تطابق الصعوبة المطلوبة فقط (للتنويع)
     if (suggestions.length < 3) {
         const difficultyMatches = allTasks.filter(task =>
             requiredDifficulty.includes(task.difficulty_level) &&
             task.status !== 'completed' &&
-            // التأكد من عدم تكرار المهام التي تم إضافتها بالفعل
+            // التأكد من عدم تكرار الأهداف التي تم إضافتها بالفعل
             !suggestions.some(s => s._id && s._id === task._id) 
         ).slice(0, 3 - suggestions.length); // نملأ الأماكن المتبقية
         
@@ -127,7 +127,7 @@ const RadarChart = () => {
 const TaskCard = ({ title, icon, isPlaceholder = false }) => (
     <div className={`p-4 rounded-xl shadow-lg transition-shadow cursor-pointer min-w-[150px] text-center ${isPlaceholder ? 'bg-[#EDE4D5] border-2 border-dashed border-gray-300' : 'bg-[#FFF7EC]'}`}>
         <div className="text-4xl mb-2">{icon || '+'}</div>
-        <p className="font-semibold text-gray-800">{title || 'إضافة تاسك'}</p>
+        <p className="font-semibold text-gray-800">{title || 'إضافة مهمة'}</p>
     </div>
 );
 
@@ -241,7 +241,7 @@ const TiredTestStep2 = ({ setTirednessScore, nextStep }) => {
 
 const TiredTestStep3 = ({ suggestedTasks, restartTest }) => (
     <div className="p-8 bg-white rounded-xl w-full max-w-lg shadow-2xl relative text-center transform transition-all scale-100" dir="rtl">
-        <h2 className="text-xl font-bold mb-8 text-gray-800 border-b pb-3">هذه المهام المقترحة لك</h2>
+        <h2 className="text-xl font-bold mb-8 text-gray-800 border-b pb-3">هذه الأهداف المقترحة لك</h2>
         
         <div className="grid grid-cols-2 gap-4">
             {suggestedTasks.length > 0 ? (
@@ -253,7 +253,7 @@ const TiredTestStep3 = ({ suggestedTasks, restartTest }) => (
                     </div>
                 ))
             ) : (
-                <p className="col-span-2 text-center text-lg text-gray-500">لا توجد مهام مقترحة حاليًا.</p>
+                <p className="col-span-2 text-center text-lg text-gray-500">لا توجد أهداف مقترحة حاليًا.</p>
             )}
         </div>
 
@@ -400,17 +400,17 @@ const DashboardView = ({ advice }) => {
                 <div className="lg:col-span-1 md:col-span-3 md:text-center space-y-4">
                     <div className="p-6 bg-[#EBE0D2] rounded-xl shadow-lg border border-gray-300">
                         <h3 className="text-xl font-bold text-gray-800 mb-3">أفعل المزيد من الإنجازات</h3>
-                        <p className="text-gray-600 text-sm mb-4">مستعد لإنجاز جديد! هيا قم بإضافة المزيد من المهام</p>
+                        <p className="text-gray-600 text-sm mb-4">مستعد لإنجاز جديد! هيا قم بإضافة المزيد من الأهداف</p>
                         <a href="/dashboard/tasks" className="py-2 px-6 bg-indigo-500 text-white text-nowrap font-semibold rounded-lg hover:bg-indigo-600 transition-colors shadow-md">
-                            تاسك جديد
+                            مهمة جديد
                         </a>
                     </div>
                 </div>
             </section >
                         <div className="mt-10">
-                            <h3 className="text-xl font-bold text-gray-800 mb-4">تاسكات اليوم</h3>
+                            <h3 className="text-xl font-bold text-gray-800 mb-4">مهام اليوم</h3>
                             {isLoading ? (
-                                <p className="text-gray-600">جاري تحميل المهام...</p>
+                                <p className="text-gray-600">جاري تحميل الأهداف...</p>
                             ) : (
                                 <div className="flex flex-wrap gap-4 justify-start">
                                     {todaysTasks.map(task => (
