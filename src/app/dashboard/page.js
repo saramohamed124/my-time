@@ -385,7 +385,7 @@ const DashboardView = ({ advice, user }) => {
 
     return (
         <div className="text-right">
-            <h2 className="text-3xl font-extrabold text-gray-800 mb-8">أهلاً، {user?.firstName} {user?.lastName}</h2>
+            <h2 className="text-3xl font-extrabold text-center md:text-start text-gray-800 mb-8">أهلاً، {user?.firstName} {user?.lastName}</h2>
 
             <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
                 
@@ -411,7 +411,8 @@ const DashboardView = ({ advice, user }) => {
                             height={50}
                             className="mx-auto mb-4"
                         />
-                        <p className="text-gray-600 text-sm mb-4">مستعد لإنجاز جديد! هيا قم بإضافة المزيد من المهام</p>
+                        <p className='fw-[900]'>مستعد لإنجاز جديد! </p>
+                        <p className="text-gray-700 text-xs mb-4">هيا قم بإضافة المزيد من المهام</p>
                         <a href="/dashboard/tasks" className="py-2 px-6 bg-indigo-500 text-white text-nowrap font-semibold rounded-lg hover:bg-indigo-600 transition-colors shadow-md">
                             مهمة جديد
                         </a>
