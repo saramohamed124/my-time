@@ -11,12 +11,13 @@ export default function Missions() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentMission, setCurrentMission] = useState(null);
+  const userId  = JSON.parse(localStorage.getItem('user'))._id || JSON.parse(localStorage.getItem('user')).id; 
 
   const fetchMissions = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}missions`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}missions/${userId}`);
       if (!res.ok) {
         throw new Error('فشل جلب الأهداف');
       }

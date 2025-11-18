@@ -35,7 +35,7 @@ export const DIFFICULTY_LEVELS = {
 };
 
 // --- Task Type Translations (Matching your TaskIconMap) ---
-export const TASK_TYPE_OPTIONS = {
+export const type_OPTIONS = {
     'study': 'دراسة/تعلم',
     'soft_skills': 'مهارات ناعمة',
     'mental_break': 'راحة عقلية',
@@ -62,6 +62,7 @@ const Tasks = () => {
   const dispatch = useDispatch();
   const { tasks, missions, status, error } = useSelector((state) => state.tasks);
 
+  const userId  = JSON.parse(localStorage.getItem('user'))._id || JSON.parse(localStorage.getItem('user')).id; 
   // Initial state for a new task (fixed the duplicated 'due_date' field)
   const [newTask, setNewTask] = useState({
     title: '',
@@ -70,7 +71,9 @@ const Tasks = () => {
     difficulty_level: '',
     priority: '',
     status: 'pending',
-    mission_id: ''
+    mission_id: '',
+    type: '',
+    userId: userId
   });
 
   const [editingTask, setEditingTask] = useState(null);
@@ -80,8 +83,8 @@ const Tasks = () => {
 
   // Fetch tasks and missions on initial load
   useEffect(() => {
-    dispatch(fetchTasks());
-    dispatch(fetchMissions());
+    dispatch(fetchTasks(userId));
+    dispatch(fetchMissions(userId));
   }, [dispatch]);
 
   // Helper function to get mission title from ID
@@ -110,15 +113,18 @@ const Tasks = () => {
     if (!taskData.title.trim()) {
       return 'الرجاء إدخال عنوان المهمة.';
     }
-    if (!taskData.description.trim()) {
-      return 'الرجاء إدخال وصف المهمة.';
-    }
+    // if (!taskData.description.trim()) {
+    //   return 'الرجاء إدخال وصف المهمة.';
+    // }
     // Regex: check for valid selection
     if (!taskData.mission_id || taskData.mission_id === '') {
       return 'الرجاء اختيار المهمة.';
     }
     if (!taskData.priority || taskData.priority === '') {
       return 'الرجاء اختيار الأولوية.';
+    }
+    if (!taskData.type || taskData.type === '') {
+      return 'الرجاء اختيار نوع المهمة.';
     }
     if (!taskData.difficulty_level || taskData.difficulty_level === '') {
       return 'الرجاء اختيار مستوى الصعوبة.';
@@ -136,7 +142,7 @@ const hours = parseInt(taskData.due_date);
   const handleAddTask = async (e) => {
     e.preventDefault();
     setFormError('');
-
+    console.log('Adding Task:', newTask);
     const validationError = validateForm(newTask);
     if (validationError) {
       setFormError(validationError);
@@ -145,7 +151,14 @@ const hours = parseInt(taskData.due_date);
 
     try {
       // Ensure due_date is sent as an integer
-      await dispatch(addTaskAsync({ ...newTask, due_date: parseInt(newTask.due_date) || 0 })).unwrap();
+        await dispatch(addTaskAsync({ 
+              taskData: { 
+                ...newTask, 
+                // Ensure due_date is an integer as expected by your thunk logic
+                due_date: parseInt(newTask.due_date) || 0 ,
+              }, 
+              userId 
+            })).unwrap();
       setNewTask({
         title: '',
         description: '',
@@ -154,7 +167,9 @@ const hours = parseInt(taskData.due_date);
         type: '',
         priority: '',
         status: 'pending',
-        mission_id: ''
+        mission_id: '',
+    type: '',
+        user_id: userId
       });
       setShowModal(false);
     } catch (err) {
@@ -528,9 +543,9 @@ const hours = parseInt(taskData.due_date);
 
               {/* Description */}
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">وصف المهمة <span className="text-red-500">*</span></label>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">وصف المهمة </label>
                 <textarea
-                  required
+                  // required
                   id="description"
                   rows="3"
                   value={editingTask ? editingTask.description : newTask.description}
@@ -557,16 +572,17 @@ const hours = parseInt(taskData.due_date);
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="task_type" className="block text-sm font-medium text-gray-700 mb-1">نوع المهمة</label>
+                  <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">نوع المهمة<span className="text-red-500">*</span></label>
                   <select
                     id="type"
-                    value={editingTask ? editingTask.task_type : newTask.task_type}
+                    value={editingTask ? editingTask.type : newTask.type}
                     onChange={(e) => handleInputChange(e, !!editingTask)}
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
+                    required
                   >
-                    <option value="">اختر نوع المهمة (اختياري)</option>
-                    {Object.keys(TASK_TYPE_OPTIONS).map((key) => (
-                      <option key={key} value={key}>{TASK_TYPE_OPTIONS[key]}</option>
+                    <option value="">اختر نوع المهمة </option>
+                    {Object.keys(type_OPTIONS).map((key) => (
+                      <option key={key} value={key}>{type_OPTIONS[key]}</option>
                     ))}
                   </select>
                 </div>

@@ -258,9 +258,10 @@ app.put('/user/:userId/password', async (req, res) => {
 });
 
 // Missions
-app.get('/missions', async (req, res) => {
+app.get('/missions/:user_id', async (req, res) => {
+  const userId = req.params.user_id;
   try {
-    const missions = await Missions.find({});
+    const missions = await Missions.find({userId: userId});
     res.json(missions);
   } catch (error) {
     res.status(500).json({ message: 'Server Error' });
@@ -269,9 +270,10 @@ app.get('/missions', async (req, res) => {
 
 // POST endpoint to create a new mission
 app.post('/missions', async (req, res) => {
+  const userId = req.params.user_id;
   try {
     // Create a new mission instance from the request body
-    const newMission = new Missions(req.body);
+    const newMission = new Missions(req.body, { user_id: userId });
     await newMission.save();
     res.status(201).json(newMission);
   } catch (error) {
@@ -331,9 +333,10 @@ app.delete('/missions/:id', async (req, res) => {
 // CREATE a new task with level
 
 // GET all tasks
-app.get('/tasks', async (req, res) => {
+app.get('/tasks/:user_id', async (req, res) => {
+  const userId = req.params.user_id;
     try {
-        const tasks = await Tasks.find();
+        const tasks = await Tasks.find({ userId: userId });
         res.json(tasks);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -354,7 +357,8 @@ app.get('/task/:id', async (req, res) => {
 });
 
 // POST a new task
-app.post('/tasks', async (req, res) => {
+app.post('/tasks/:user_id', async (req, res) => {
+  const userId = req.params.user_id;
 
     const { title, description, due_date, difficulty_level, priority, type,icon, status, mission_id } = req.body;
     const task = new Tasks({
@@ -366,7 +370,8 @@ app.post('/tasks', async (req, res) => {
         type,
         icon,
         status,
-        mission_id
+        mission_id,
+        userId: userId
     });
 
     try {

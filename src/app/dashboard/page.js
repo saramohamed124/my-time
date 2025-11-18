@@ -64,65 +64,84 @@ const getSuggestedTasks = (finalTirednessScore, allTasks) => {
         return [];
     }
 
-    const suggestions = [];
+    const MAX_SCORE = 13;
+const TIREDNESS_LEVELS_GENERAL = [ 
+    { 
+        score_max: 2, 
+        difficulty: ['hard', 'intermediate'], 
+        types: ['study', 'review', 'soft_skills'] 
+    }, // تعب منخفض (0-2) - يركز على العمل الجاد
+    { 
+        score_max: 6, 
+        difficulty: ['intermediate', 'easy'], 
+        types: ['soft_skills', 'physical', 'study','other'] 
+    }, // تعب متوسط (3-6) - مزيج متوازن
+    { 
+        score_max: MAX_SCORE, 
+        difficulty: ['easy'], 
+        types: ['mental_break', 'physical', 'soft_skills'] // تعب عالي (7-13) - نفضل الاستراحة أولاً
+    } 
+];
     let requiredDifficulty = [];
     let preferredTypes = [];
-    
-    const MAX_SCORE = 13;
-    
-    const TIREDNESS_LEVELS_GENERAL = [ 
-        { 
-            score_max: 2, 
-            difficulty: ['hard', 'intermediate'], 
-            types: ['study', 'review', 'soft_skills'] // تفضيل المهام العقلية والمركزة
-        }, // تعب منخفض (0-2)
-        { 
-            score_max: 6, 
-            difficulty: ['intermediate', 'easy'], 
-            types: ['soft_skills', 'physical', 'study','other'] // مزيج من المهام
-        }, // تعب متوسط (3-6)
-        { 
-            score_max: MAX_SCORE, 
-            difficulty: ['easy'], 
-            types: ['mental_break', 'physical', 'soft_skills'] // تعب عالي (7-13)
-        } 
-    ];
 
-
-    let selectedLevel = TIREDNESS_LEVELS_GENERAL[2]; // Default to high tiredness (safety)
-
+    // 1. تحديد مستوى التعب والصعوبة والأنواع المفضلة
     for (const level of TIREDNESS_LEVELS_GENERAL) {
         if (finalTirednessScore <= level.score_max) {
             requiredDifficulty = level.difficulty;
             preferredTypes = level.types;
-            selectedLevel = level;
             break;
         }
     }
-
-
-
-    const typeMatches = allTasks.filter(task =>
+    
+    // المهام التي لم تُنجز بعد
+    const activeTasks = allTasks.filter(task => task.status !== 'completed');
+    const suggestions = [];
+    
+    // --- 2. بناء مجموعات الترشيح بترتيب الأولوية ---
+    
+    // أ. المجموعة الأولى: مطابقة مزدوجة (صعوبة + نوع) - الأولوية القصوى
+    const groupA = activeTasks.filter(task =>
         requiredDifficulty.includes(task.difficulty_level) &&
+        preferredTypes.includes(task.type)
+    );
+    
+    // ب. المجموعة الثانية: مطابقة النوع فقط - لضمان التنويع
+    const groupB = activeTasks.filter(task =>
         preferredTypes.includes(task.type) &&
-        task.status !== 'completed'
-    ).slice(0, 2);
+        !suggestions.some(s => s._id === task._id) // تجنب المهام التي تم اختيارها
+    );
 
-    suggestions.push(...typeMatches);
-
+    // ج. المجموعة الثالثة: مطابقة الصعوبة فقط - لضمان الاستمرارية بمستوى الإرهاق
+    const groupC = activeTasks.filter(task =>
+        requiredDifficulty.includes(task.difficulty_level) &&
+        !suggestions.some(s => s._id === task._id) // تجنب المهام التي تم اختيارها
+    );
+    
+    // --- 3. تجميع المهام المقترحة حتى 3 ---
+    
+    // إضافة من المجموعة أ (مطابقة مزدوجة)
+    suggestions.push(...groupA.slice(0, 3));
+    
+    // إضافة من المجموعة ب (مطابقة النوع) لملء المقترحات
     if (suggestions.length < 3) {
-        const difficultyMatches = allTasks.filter(task =>
-            requiredDifficulty.includes(task.difficulty_level) &&
-            task.status !== 'completed' &&
-            !suggestions.some(s => s._id && s._id === task._id)
-        ).slice(0, 3 - suggestions.length);
-
-        suggestions.push(...difficultyMatches);
+        const uniqueGroupB = groupB.filter(task => !suggestions.some(s => s._id === task._id));
+        suggestions.push(...uniqueGroupB.slice(0, 3 - suggestions.length));
     }
+    
+    // إضافة من المجموعة ج (مطابقة الصعوبة) لملء المقترحات
+    if (suggestions.length < 3) {
+        const uniqueGroupC = groupC.filter(task => !suggestions.some(s => s._id === task._id));
+        suggestions.push(...uniqueGroupC.slice(0, 3 - suggestions.length));
+    }
+    
+    // إرجاع أول 3 مهام فريدة
+    // (يتم التعامل مع الفرادة في الخطوات السابقة، لكن للتأكد)
+    const uniqueSuggestions = Array.from(new Set(suggestions.map(s => s._id)))
+        .map(_id => suggestions.find(s => s._id === _id));
 
-    return suggestions.slice(0, 3);
+    return uniqueSuggestions.slice(0, 3);
 };
-
 // --- Shared Components (RadarChart, TaskCard, MissionsCard) ---
 
 const TaskCard = ({ title, icon, taskType, isPlaceholder = false }) => {
@@ -262,7 +281,7 @@ const TiredTestStep2 = ({ setTirednessScore, nextStep, closeModal }) => {
 };
 const TiredTestStep3 = ({ suggestedTasks, restartTest }) => (
     <div className="p-8 bg-white rounded-xl w-full max-w-lg shadow-2xl relative text-center transform transition-all scale-100" dir="rtl">
-        <h2 className="text-xl font-bold mb-8 text-gray-800 border-b pb-3">هذه الأهداف المقترحة لك</h2>
+        <h2 className="text-xl font-bold mb-8 text-gray-800 border-b pb-3">هذه المهام المقترحة لك</h2>
         
         <div className="grid grid-cols-2 gap-4">
             {suggestedTasks.length > 0 ? (
@@ -281,7 +300,7 @@ const TiredTestStep3 = ({ suggestedTasks, restartTest }) => (
                     </div>
                 ))
             ) : (
-                <p className="col-span-2 text-center text-lg text-gray-500">لا توجد أهداف مقترحة حاليًا.</p>
+                <p className="col-span-2 text-center text-lg text-gray-500">لا توجد مهام مقترحة حاليًا.</p>
             )}
         </div>
 
@@ -302,14 +321,15 @@ const DashboardView = ({ advice, user }) => {
     const [testStep, setTestStep] = useState(1);
     const [headache, setHeadache] = useState(null);
     const [tirednessLevelScore, setTirednessLevelScore] = useState(null); 
-    
+    const userId  = JSON.parse(localStorage.getItem('user'))._id || JSON.parse(localStorage.getItem('user')).id; 
+
     useEffect(() => {
         const fetchTasks = async () => {
 
             setIsLoading(true);
             try {
                 // يجب استبدال هذا برمز جلب المهام الفعلي
-                const response = await fetch(`${API_BASE_URL}tasks`);
+                const response = await fetch(`${API_BASE_URL}tasks/${userId}`);
                 const data = await response.json();
 
                 const fetchedTasks = data.data || data; 
@@ -425,13 +445,15 @@ const DashboardView = ({ advice, user }) => {
                                 <p className="text-gray-600">جاري تحميل الأهداف...</p>
                             ) : (
                                 <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                                    {todaysTasks.map(task => (
+                                    {todaysTasks.length > 0 ? (todaysTasks.map(task => (
                                         <TaskCard 
                                             key={task._id} 
                                             title={task?.title} 
                                             taskType={task?.type} // Pass the task type
                                         />
-                                    ))}
+                                    ))) : (
+                                        <p className="text-gray-600">لا توجد مهام محددة لليوم.</p>
+                                    )}
                                 </div>
                             )}
                         </div>

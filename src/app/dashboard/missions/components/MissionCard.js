@@ -75,7 +75,12 @@ const MissionCard = ({ mission, onUpdateStatus, onDelete, onEdit }) => {
         <div className="relative bg-white rounded-lg shadow-md p-6 border-t-4 border-solid border-blue-500">
             <div className="flex justify-between items-start">
                 <h3 className={`text-xl font-bold ${mission.status === 'completed' && 'line-through'}`}>{mission.title}</h3>
+                <button
+                    onClick={() => onEdit(mission)}
+                    className="absolute top-[20px] left-[15px]"
+                >
                     <Image src={edit_icon} alt="Edit" className="w-4 h-4 hover:opacity-70" />
+                </button>
             </div>
             <p className={`text-sm text-gray-600 mt-2  ${mission.status === 'completed' && 'line-through'}`}>{mission.description}</p>
             <div className="mt-4 flex justify-between items-center">
@@ -92,11 +97,6 @@ const MissionCard = ({ mission, onUpdateStatus, onDelete, onEdit }) => {
                 تاريخ الانتهاء: {new Date(mission.end_date).toLocaleDateString('ar-EG')}
             </p>
             <div className="mt-4 flex justify-center items-center gap-2 space-x-2 flex-wrap">
-                <button
-                    onClick={() => onEdit(mission)}
-                    className="absolute top-[20px] right-2"
-                >
-                </button>
                 <button
                     onClick={() => onUpdateStatus(mission._id, 'in-progress')}
                     className="w-15 px-4 py-2 text-white  bg-indigo-500 rounded-lg"

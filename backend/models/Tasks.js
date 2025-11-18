@@ -49,6 +49,11 @@ const TaskSchema = new Schema({
         ref: 'Missions',
         required: true
     },
+        userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Users', 
+        required: true,
+    },
       createdAt: {
     type: Date,
     default: Date.now

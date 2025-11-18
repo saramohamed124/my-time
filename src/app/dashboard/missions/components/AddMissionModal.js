@@ -61,7 +61,7 @@ const MissionModal = ({ onClose, mission }) => {
         setIsLoading(true);
         try {
             // Note: localStorage might not be available in all environments.
-            const userId = JSON.parse(localStorage.getItem('user'))._id;
+            const userId = JSON.parse(localStorage.getItem('user'))._id || JSON.parse(localStorage.getItem('user')).id;
             const url = isEditing
                 ? `${process.env.NEXT_PUBLIC_API_URL}missions/${mission._id}`
                 : `${process.env.NEXT_PUBLIC_API_URL}missions`;
@@ -107,7 +107,7 @@ const MissionModal = ({ onClose, mission }) => {
                             value={formData.title}
                             onChange={handleChange}
                             className="mt-1 p-2 w-full border border-gray-300 rounded-md text-right"
-                            placeholder="مثال: إتقان أساسيات React"
+                            placeholder="مثال: إتقان أساسيات البرمجة"
                             required
                         />
                         {validationErrors.title && (

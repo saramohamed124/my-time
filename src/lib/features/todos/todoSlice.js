@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-export const fetchMissions = createAsyncThunk('missions/fetchMissions', async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}missions`);
+export const fetchMissions = createAsyncThunk('missions/fetchMissions', async (userId) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}missions/${userId}`);
   if (!response.ok) {
     throw new Error('فشل في تحميل الأهداف.');
   }
@@ -9,8 +9,8 @@ export const fetchMissions = createAsyncThunk('missions/fetchMissions', async ()
 });
 
 // Async thunk to fetch all tasks from the API
-export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}tasks`);
+export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async (userId) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}tasks/${userId}`);
   if (!response.ok) {
     throw new Error('فشل في تحميل الأهداف.');
   }
@@ -18,8 +18,8 @@ export const fetchTasks = createAsyncThunk('tasks/fetchTasks', async () => {
 });
 
 // Async thunk to add a new task
-export const addTaskAsync = createAsyncThunk('tasks/addTask', async (taskData) => {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}tasks`, {
+export const addTaskAsync = createAsyncThunk('tasks/addTask', async ({taskData, userId}) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}tasks/${userId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(taskData),
