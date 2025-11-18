@@ -402,7 +402,7 @@ const DashboardView = ({ advice, user }) => {
                         <p className="text-sm">ساعدنا في تحديد أولوياتك.</p>
                     </div>
                 </div>
-                <div className="lg:col-span-1 md:col-span-3 md:text-center space-y-4">
+                <div className="lg:col-span-1 md:col-span-3 text-center space-y-4">
                     <div className="p-6 bg-white rounded-xl shadow-lg border border-gray-300">
                         <Image 
                             src={cup_icon}
@@ -418,12 +418,12 @@ const DashboardView = ({ advice, user }) => {
                     </div>
                 </div>
             </section >
-                        <div className="mt-10">
+                        <div className="mt-10 mx-auto ">
                             <h3 className="text-xl font-bold text-gray-800 mb-4">مهام اليوم</h3>
                             {isLoading ? (
                                 <p className="text-gray-600">جاري تحميل الأهداف...</p>
                             ) : (
-                                <div className="flex flex-wrap gap-4 justify-start">
+                                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
                                     {todaysTasks.map(task => (
                                         <TaskCard 
                                             key={task._id} 
