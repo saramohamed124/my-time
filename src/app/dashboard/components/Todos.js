@@ -13,11 +13,36 @@ import {
 } from '@/lib/features/todos/todoSlice';
 
 // Hardcoded for consistency, could be fetched from API in a real app
-const STATUS_OPTIONS = ['pending', 'in-progress', 'completed'];
-const PRIORITY_OPTIONS = ['low', 'medium', 'high'];
-const DIFFICULTY_LEVELS = ['easy', 'intermediate', 'hard'];
-const TASK_TYPES = ['study', 'soft_skills', 'mental_break', 'physical', 'review', 'other'];
+// --- Status Translations ---
+export const STATUS_OPTIONS = {
+    'pending': 'معلق',
+    'in-progress': 'قيد التقدم',
+    'completed': 'مكتمل',
+};
 
+// --- Priority Translations ---
+export const PRIORITY_OPTIONS = {
+    'low': 'منخفض',
+    'medium': 'متوسط',
+    'high': 'عالي',
+};
+
+// --- Difficulty Translations (from previous fix) ---
+export const DIFFICULTY_LEVELS = {
+    'easy': 'سهل',
+    'intermediate': 'متوسط',
+    'hard': 'صعب',
+};
+
+// --- Task Type Translations (Matching your TaskIconMap) ---
+export const TASK_TYPE_OPTIONS = {
+    'study': 'دراسة/تعلم',
+    'soft_skills': 'مهارات ناعمة',
+    'mental_break': 'راحة عقلية',
+    'physical': 'نشاط بدني',
+    'review': 'مراجعة',
+    'other': 'أخرى',
+};
 // Function to map priority to a color for the flag icon
 const getPriorityColor = (priority) => {
   switch (priority) {
@@ -99,11 +124,10 @@ const Tasks = () => {
       return 'الرجاء اختيار مستوى الصعوبة.';
     }
     // Regex: check for non-negative integer for estimated hours
-    const hours = parseInt(taskData.due_date);
+const hours = parseInt(taskData.due_date);
     if (isNaN(hours) || hours < 0 || !/^\d+$/.test(taskData.due_date)) {
       return 'الرجاء إدخال عدد صحيح موجب أو صفر لعدد الساعات المقدرة.';
     }
-
     return ''; // No errors
   };
 
@@ -196,13 +220,13 @@ const Tasks = () => {
 
   const openEditModal = (task) => {
     // Ensure estimated hours (due_date) is treated as a string for the input field
-    setEditingTask({ ...task, due_date: String(task.due_date) });
+    setEditingTask({ ...task, due_date: parseInt(task.due_date) });
     setShowModal(true);
     setFormError('');
   };
 
   return (
-    <article className="p-4 sm:p-6 bg-gray-50 min-h-screen font-sans text-right" dir="rtl">
+    <article className="p-4 sm:p-6  min-h-screen font-sans text-right" dir="rtl">
       {/* Header & Add Task Button */}
       <section className="flex flex-wrap w-full justify-between my-3 gap-4 items-center pb-4">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">قائمة المهام</h1>
@@ -223,7 +247,7 @@ const Tasks = () => {
 
       {/* Filter by Mission */}
       <section className="my-6">
-        <label htmlFor="mission-filter" className="text-sm font-medium text-gray-700 block mb-2">تصفية حسب المهمة</label>
+        <label htmlFor="mission-filter" className="text-sm font-medium text-gray-700 block mb-2">تصفية حسب الهدف</label>
         <select
           id="mission-filter"
           value={filterMission}
@@ -314,7 +338,11 @@ const Tasks = () => {
                           <circle cx="12" cy="12" r="10"></circle>
                           <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
-                        {task.due_date}h مقدرة
+                       {new Date(task.due_date).toLocaleDateString('ar-EG', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+  })}ساعة مقدرة
                       </div>
 
                       {/* Action Buttons: Edit and Delete */}
@@ -402,7 +430,7 @@ const Tasks = () => {
                           <circle cx="12" cy="12" r="10"></circle>
                           <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
-                        {task.due_date}h مقدرة
+                        {task.due_date}ساعة مقدرة
                       </div>
                       
                       {/* Action Buttons: Edit and Delete (Still available for completed tasks) */}
@@ -523,8 +551,8 @@ const Tasks = () => {
                     required
                   >
                     <option value="">اختر الأولوية</option>
-                    {PRIORITY_OPTIONS.map((p) => (
-                      <option key={p} value={p}>{p}</option>
+                    {Object.keys(PRIORITY_OPTIONS).map((p) => (
+                      <option key={p} value={p}>{PRIORITY_OPTIONS[p] || p}</option>
                     ))}
                   </select>
                 </div>
@@ -537,8 +565,8 @@ const Tasks = () => {
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
                   >
                     <option value="">اختر نوع المهمة (اختياري)</option>
-                    {TASK_TYPES.map((type) => (
-                      <option key={type} value={type}>{type}</option>
+                    {Object.keys(TASK_TYPE_OPTIONS).map((key) => (
+                      <option key={key} value={key}>{TASK_TYPE_OPTIONS[key]}</option>
                     ))}
                   </select>
                 </div>
@@ -569,8 +597,8 @@ const Tasks = () => {
                     required
                   >
                     <option value="">اختر مستوى الصعوبة</option>
-                    {DIFFICULTY_LEVELS.map((p) => (
-                      <option key={p} value={p}>{p}</option>
+                    {Object.keys(DIFFICULTY_LEVELS).map((p) => (
+                      <option key={p} value={p}>{DIFFICULTY_LEVELS[p] || p}</option>
                     ))}
                   </select>
                 </div>
@@ -586,8 +614,8 @@ const Tasks = () => {
                       className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
                       required
                     >
-                      {STATUS_OPTIONS.map((p) => (
-                        <option key={p} value={p}>{p}</option>
+                      {Object.keys(STATUS_OPTIONS).map((p) => (
+                        <option key={p} value={p}>{STATUS_OPTIONS[p] || p}</option>
                       ))}
                     </select>
                   </div>

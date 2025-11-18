@@ -106,7 +106,7 @@ const MissionModal = ({ onClose, mission }) => {
                             name="title"
                             value={formData.title}
                             onChange={handleChange}
-                            className="mt-1 p-2 w-full border rounded-md text-right"
+                            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-right"
                             placeholder="مثال: إتقان أساسيات React"
                             required
                         />
@@ -120,7 +120,7 @@ const MissionModal = ({ onClose, mission }) => {
                             name="description"
                             value={formData.description}
                             onChange={handleChange}
-                            className="mt-1 p-2 w-full border rounded-md text-right"
+                            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-right"
                             placeholder="صف أهداف مهمتك"
                         ></textarea>
                         {validationErrors.description && (
@@ -134,7 +134,7 @@ const MissionModal = ({ onClose, mission }) => {
                             name="deadline"
                             value={formData.deadline}
                             onChange={handleChange}
-                            className="mt-1 p-2 w-full border rounded-md text-right"
+                            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-right"
                             required
                         />
                     </div>
@@ -144,7 +144,7 @@ const MissionModal = ({ onClose, mission }) => {
                             name="type"
                             value={formData.type}
                             onChange={handleChange}
-                            className="mt-1 p-2 w-full border rounded-md text-right"
+                            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-right"
                             required
                         >
                             <option value="study">دراسة</option>
@@ -160,7 +160,7 @@ const MissionModal = ({ onClose, mission }) => {
                             name="difficulty"
                             value={formData.difficulty}
                             onChange={handleChange}
-                            className="mt-1 p-2 w-full border rounded-md text-right"
+                            className="mt-1 p-2 w-full border border-gray-300 rounded-md text-right"
                             required
                         >
                             <option value="easy">سهل</option>
@@ -181,7 +181,7 @@ const MissionModal = ({ onClose, mission }) => {
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-400"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all shadow-lg font-semibold text-lg"
                             disabled={isLoading}
                         >
                             {isLoading ? 'جارٍ الحفظ...' : 'حفظ الهدف'}

@@ -1,26 +1,64 @@
 'use client';
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import advicesData from './dailyTips.json';
-// --- Static Data (For UI/Logic only, not for data storage) ---
-const TIREDNESS_LEVELS = [
-    { level: 'قليل', score: 0, text: 'Little' },
-    { level: 'أقل من المتوسط', score: 1, text: 'Below Avg' },
-    { level: 'متوسط', score: 2, text: 'Average' },
-    { level: 'فوق المتوسط', score: 3, text: 'Above Avg' },
-    { level: 'عالي', score: 4, text: 'High' }
+import { useAuth } from '../context/AuthContext';
+
+// icons
+import study_icon from './assets/icons/study_icon.png';
+import physical_icon from './assets/icons/physical_icon.png';
+import mental_break_icon from './assets/icons/mental_break_icon.png';
+import soft_skills_icon from './assets/icons/soft_skills_icon.png';
+import review_icon from './assets/icons/review_icon.png';
+import cup_icon from './assets/icons/cup.png'
+import Image from 'next/image';
+
+const TaskIconMap = {
+    study: study_icon,
+    physical: physical_icon,
+    mental_break: mental_break_icon,
+    soft_skills: soft_skills_icon,
+    review: review_icon,
+    default: review_icon, // Use review as a fallback or create a generic default icon
+};
+const TIREDNESS_QUESTIONS = [
+    {
+        id: 1,
+        question: 'ما مدى سهولة تشتت انتباهك أو صعوبة تركيزك حالياً؟',
+        options: [
+            { text: 'لا أواجه صعوب', score: 0 },
+            { text: 'صعوبة بسيطة في التركيز', score: 1 },
+            { text: 'أواجه صعوبة متوسطة في العودة للمهمة', score: 2 },
+            { text: 'أجد صعوبة كبيرة في الحفاظ على التركيز', score: 3 },
+            { text: 'التركيز مستحيل حالياً', score: 4 },
+        ]
+    },
+    {
+        id: 2,
+        question: 'ما هو مستوى الدافع أو الحماس لديك لبدء عمل جديد الآن؟',
+        options: [
+            { text: 'حماس ودافع عالي جداً', score: 0 },
+            { text: 'دافع جيد، لكن أحتاج لجهد للبدء', score: 1 },
+            { text: 'دافع متوسط/محايد', score: 2 },
+            { text: 'دافع منخفض جداً', score: 3 },
+            { text: 'لا يوجد دافع على الإطلاق', score: 4 },
+        ]
+    },
+    {
+        id: 3,
+        question: 'كيف تقيّم مستوى الطاقة الجسدية لديك في الوقت الحالي؟',
+        options: [
+            { text: 'طاقة عالية ومستعد للتحرك', score: 0 },
+            { text: 'طاقة جيدة، أشعر ببعض الثقل', score: 1 },
+            { text: 'طاقة منخفضة قليلاً وأشعر بالتعب', score: 2 },
+            { text: 'أشعر بالإنهاك الجسدي والرغبة في الاستلقاء', score: 3 },
+            { text: 'إرهاق شديد وعجز عن الحركة', score: 4 },
+        ]
+    }
 ];
 
-const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/'}`; 
+const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/'}`;
 
-/**
- * الخوارزمية المحسّنة لاقتراح الأهداف بناءً على مستوى التعب المُقاس (نطاق 0-5).
- * تم تعديل حدود النقاط لتناسب النطاق الفعلي المُرسل من الواجهة.
- * * @param {number} tirednessScore - نقاط التعب المُقاسة (0-5).
- * @param {Array<Object>} allTasks - قائمة بكل الأهداف المتاحة.
- * @returns {Array<Object>} - قائمة بثلاث أهداف مقترحة كحد أقصى.
- */
-const getSuggestedTasks = (tirednessScore, allTasks) => {
-    // 1. التحقق من صحة المدخلات
+const getSuggestedTasks = (finalTirednessScore, allTasks) => {
     if (!allTasks || allTasks.length === 0) {
         console.log("Error: Task list is empty or invalid.");
         return [];
@@ -29,108 +67,82 @@ const getSuggestedTasks = (tirednessScore, allTasks) => {
     const suggestions = [];
     let requiredDifficulty = [];
     let preferredTypes = [];
-
-    // 2. تعريف متطلبات الأهداف بناءً على مستوى التعب (النطاق المُصحح: 0-5)
     
-    // التعب المنخفض: 0 أو 1 (طاقة عالية)
-    if (tirednessScore <= 1) { 
-        requiredDifficulty = ['hard', 'intermediate'];
-        preferredTypes = ['study', 'review'];
-        console.log(`Score: ${tirednessScore} -> Low Tiredness (Hard Tasks)`);
+    const MAX_SCORE = 13;
+    
+    const TIREDNESS_LEVELS_GENERAL = [ 
+        { 
+            score_max: 2, 
+            difficulty: ['hard', 'intermediate'], 
+            types: ['study', 'review', 'soft_skills'] // تفضيل المهام العقلية والمركزة
+        }, // تعب منخفض (0-2)
+        { 
+            score_max: 6, 
+            difficulty: ['intermediate', 'easy'], 
+            types: ['soft_skills', 'physical', 'study','other'] // مزيج من المهام
+        }, // تعب متوسط (3-6)
+        { 
+            score_max: MAX_SCORE, 
+            difficulty: ['easy'], 
+            types: ['mental_break', 'physical', 'soft_skills'] // تعب عالي (7-13)
+        } 
+    ];
 
-    // التعب المتوسط: 2 أو 3 (طاقة متوازنة)
-    } else if (tirednessScore <= 3) { 
-        requiredDifficulty = ['intermediate', 'easy'];
-        preferredTypes = ['soft_skills', 'physical'];
-        console.log(`Score: ${tirednessScore} -> Medium Tiredness (Balanced Tasks)`);
 
-    // التعب العالي: 4 أو 5 (إرهاق، بحاجة لراحة)
-    } else { 
-        requiredDifficulty = ['easy'];
-        preferredTypes = ['mental_break', 'physical', 'soft_skills'];
-        console.log(`Score: ${tirednessScore} -> High Tiredness (Easy/Break Tasks)`);
+    let selectedLevel = TIREDNESS_LEVELS_GENERAL[2]; // Default to high tiredness (safety)
+
+    for (const level of TIREDNESS_LEVELS_GENERAL) {
+        if (finalTirednessScore <= level.score_max) {
+            requiredDifficulty = level.difficulty;
+            preferredTypes = level.types;
+            selectedLevel = level;
+            break;
+        }
     }
 
-    // 3. استراتيجية التصفية (لضمان 3 اقتراحات فريدة)
 
-    // Strategy A: المطابقة القوية - أهداف تطابق الصعوبة المطلوبة والنوع المُفضل
+
     const typeMatches = allTasks.filter(task =>
         requiredDifficulty.includes(task.difficulty_level) &&
         preferredTypes.includes(task.type) &&
-        task.status !== 'completed' // لا تقترح الأهداف المكتملة
-    ).slice(0, 2); // نأخذ ما يصل إلى مهمتين
+        task.status !== 'completed'
+    ).slice(0, 2);
 
     suggestions.push(...typeMatches);
 
-    // Strategy B: ملء الفراغ - أهداف تطابق الصعوبة المطلوبة فقط (للتنويع)
     if (suggestions.length < 3) {
         const difficultyMatches = allTasks.filter(task =>
             requiredDifficulty.includes(task.difficulty_level) &&
             task.status !== 'completed' &&
-            // التأكد من عدم تكرار الأهداف التي تم إضافتها بالفعل
-            !suggestions.some(s => s._id && s._id === task._id) 
-        ).slice(0, 3 - suggestions.length); // نملأ الأماكن المتبقية
-        
+            !suggestions.some(s => s._id && s._id === task._id)
+        ).slice(0, 3 - suggestions.length);
+
         suggestions.push(...difficultyMatches);
     }
-    
-    // 4. إرجاع 3 اقتراحات نهائية كحد أقصى
+
     return suggestions.slice(0, 3);
 };
 
-
 // --- Shared Components (RadarChart, TaskCard, MissionsCard) ---
 
-const RadarChart = () => {
-    const points = "28,50 40,75 70,80 75,50 70,20 40,25";
-    const dataPoints = [
-        {x: 75, y: 50, value: 808},
-        {x: 70, y: 80, value: 237},
-        {x: 40, y: 75, value: 201},
-        {x: 28, y: 50, value: 705},
-        {x: 40, y: 25, value: 435},
-        {x: 70, y: 20, value: 74},
-    ];
-
+const TaskCard = ({ title, icon, taskType, isPlaceholder = false }) => {
+    const imageSource = TaskIconMap[taskType] || TaskIconMap.default;
     return (
-        <svg viewBox="0 0 100 100" className="w-full h-full text-indigo-500" role="img" aria-labelledby="chart-title">
-            <title id="chart-title">معدل الإنجاز</title>
-            <circle cx="50" cy="50" r="45" stroke="#e0e0e0" fill="none" strokeWidth="1"></circle>
-            <circle cx="50" cy="50" r="30" stroke="#f0f0f0" fill="none" strokeWidth="1"></circle>
-            <line x1="50" y1="50" x2="75" y2="50" stroke="#e0e0e0" strokeWidth="0.5"></line>
-            <line x1="50" y1="50" x2="70" y2="80" stroke="#e0e0e0" strokeWidth="0.5"></line>
-            <line x1="50" y1="50" x2="40" y2="75" stroke="#e0e0e0" strokeWidth="0.5"></line>
-            <line x1="50" y1="50" x2="28" y2="50" stroke="#e0e0e0" strokeWidth="0.5"></line>
-            <line x1="50" y1="50" x2="40" y2="25" stroke="#e0e0e0" strokeWidth="0.5"></line>
-            <line x1="50" y1="50" x2="70" y2="20" stroke="#e0e0e0" strokeWidth="0.5"></line>
-            <polygon points={points} fill="#6366f1" opacity="0.6" stroke="#6366f1" strokeWidth="1.5" />
-            {dataPoints.map((p, index) => (
-                <g key={index}>
-                    <circle cx={p.x} cy={p.y} r="2" fill="white" stroke="#6366f1" strokeWidth="1.5" />
-                    <text 
-                        x={p.x + (p.x > 50 ? 5 : -5)} 
-                        y={p.y + (p.y > 50 ? 5 : -5)} 
-                        fontSize="4" 
-                        textAnchor={p.x > 50 ? "start" : "end"} 
-                        fill="#374151" 
-                        fontWeight="bold"
-                        className="select-none"
-                    >
-                        {p.value}
-                    </text>
-                </g>
-            ))}
-        </svg>
+        <div className={`p-4 rounded-xl shadow-lg transition-shadow cursor-pointer min-w-[150px] text-center ${isPlaceholder ? 'bg-white border-2 border-dashed border-gray-300' : 'bg-white'}`}>
+                <div className="w-12 h-12 mx-auto mb-2 relative">
+                    {/* Assuming the imported 'imageSource' is a Next.js Static Image import */}
+                    <Image
+                        src={imageSource} 
+                        alt={title} 
+                        layout="fill" 
+                        objectFit="contain" 
+                    />
+                </div>
+
+            <p className="font-semibold text-gray-800">{title}</p>
+        </div>
     );
 };
-
-const TaskCard = ({ title, icon, isPlaceholder = false }) => (
-    <div className={`p-4 rounded-xl shadow-lg transition-shadow cursor-pointer min-w-[150px] text-center ${isPlaceholder ? 'bg-[#EDE4D5] border-2 border-dashed border-gray-300' : 'bg-[#FFF7EC]'}`}>
-        <div className="text-4xl mb-2">{icon || '+'}</div>
-        <p className="font-semibold text-gray-800">{title || 'إضافة مهمة'}</p>
-    </div>
-);
-
 // --- Modal Components for Tiredness Test ---
 
 const TiredTestStep1 = ({ setHeadache, nextStep, closeModal }) => (
@@ -170,75 +182,84 @@ const TiredTestStep1 = ({ setHeadache, nextStep, closeModal }) => (
     </div>
 );
 
-const TiredTestStep2 = ({ setTirednessScore, nextStep }) => {
-    const [selectedScore, setSelectedScore] = useState(null);
+const TiredTestStep2 = ({ setTirednessScore, nextStep, closeModal }) => {
+    const [selectedScores, setSelectedScores] = useState({});
 
-    const renderDots = (score) => {
-        const dotsArray = [];
-        const numDots = score + 1; 
-
-        for (let i = 0; i < numDots; i++) {
-            dotsArray.push({
-                // Use fixed dots for better visual consistency
-                x: [30, 70, 50, 20, 80][i] || 50,
-                y: [50, 50, 30, 70, 70][i] || 50,
-                r: 4
-            });
-        }
-
-        return (
-            <svg viewBox="0 0 100 100" className="w-16 h-16 transition-all">
-                {dotsArray.map((dot, i) => (
-                    <circle key={i} cx={dot.x} cy={dot.y} r={dot.r} fill="#FF8C00" />
-                ))}
-            </svg>
-        );
+    // تحديث النتيجة عند اختيار خيار
+    const handleSelect = (questionId, score) => {
+        setSelectedScores(prev => ({
+            ...prev,
+            [questionId]: score
+        }));
     };
 
-    const handleSelect = (score) => {
-        setSelectedScore(score);
-        setTirednessScore(score);
+    // التحقق مما إذا تم الإجابة على جميع الأسئلة
+    const allAnswered = TIREDNESS_QUESTIONS.every(q => selectedScores.hasOwnProperty(q.id));
+
+    // حساب مجموع النقاط
+    const totalScore = useMemo(() => {
+        return Object.values(selectedScores).reduce((sum, score) => sum + score, 0);
+    }, [selectedScores]);
+
+    const handleNext = () => {
+        setTirednessScore(totalScore);
+        nextStep();
     }
 
     return (
-        <div className="p-8 bg-white rounded-xl w-full max-w-2xl shadow-2xl relative text-center transform transition-all scale-100" dir="rtl">
-            <h2 className="text-xl font-bold mb-8 text-gray-800">هل تشعر بالتعب؟</h2>
-            <p className="text-lg font-bold text-gray-700 mb-6">معدل شعورك بالتعب</p>
+        <div className="p-8 bg-white rounded-xl w-full max-w-4xl max-h-[80%] overflow-y-scroll shadow-2xl relative text-center transform transition-all scale-100" dir="rtl">
+            <button
+                onClick={closeModal}
+                className="absolute top-4 left-4 text-gray-500 hover:text-red-500 text-3xl font-light"
+                title="إغلاق"
+            >
+                <div className="w-8 h-8 rounded-full border-2 border-red-500 text-red-500 flex items-center justify-center font-extrabold text-2xl p-0 leading-none">
+                    &times;
+                </div>
+            </button>
 
-            <div className="grid grid-cols-5 gap-3 sm:gap-6 px-4">
-                {TIREDNESS_LEVELS.map(({ level, score }) => (
-                    <button
-                        key={score}
-                        onClick={() => handleSelect(score)}
-                        className={`p-2 sm:p-4 rounded-xl transition-all border-2 flex flex-col items-center text-sm font-medium h-48 ${
-                            selectedScore === score
-                                ? 'bg-indigo-50 border-indigo-500 shadow-lg text-indigo-700 scale-[1.03]'
-                                : 'bg-white border-gray-200 hover:bg-gray-100 text-gray-600'
-                        }`}
-                    >
-                        <div className="flex justify-center items-center h-2/3">
-                            {renderDots(score)} 
+            <h2 className="text-2xl font-bold mb-8 text-gray-800 border-b pb-3">2. قيّم مستوى الإرهاق لديك حالياً</h2>
+            
+            <div className="space-y-8 text-right">
+                {TIREDNESS_QUESTIONS.map((q) => (
+                    <div key={q.id} className="p-4 bg-gray-50 rounded-lg shadow-sm">
+                        <p className="text-lg font-semibold text-gray-800 mb-4">
+                            {q.id}. {q.question}
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            {q.options.map((option) => (
+                                <button
+                                    key={option.score}
+                                    onClick={() => handleSelect(q.id, option.score)}
+                                    className={`p-2 rounded-xl transition-all border-2 text-sm h-full ${
+                                        selectedScores[q.id] === option.score
+                                            ? 'bg-indigo-100 border-indigo-600 shadow-md font-bold text-indigo-800'
+                                            : 'bg-white border-gray-200 hover:bg-gray-100 text-gray-700'
+                                    }`}
+                                >
+                                    {option.text}
+                                </button>
+                            ))}
                         </div>
-                        <span className="mt-2 text-base font-semibold">{level}</span>
-                    </button>
+                    </div>
                 ))}
             </div>
 
             <button
-                onClick={nextStep}
-                disabled={selectedScore === null}
+                onClick={handleNext}
+                disabled={!allAnswered}
                 className={`w-full mt-10 py-3 rounded-xl transition-all font-semibold text-lg ${
-                    selectedScore !== null
+                    allAnswered
                         ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg'
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
             >
-                متابعة
+                عرض الأهداف المقترحة
             </button>
+            {/* <p className="text-sm mt-3 text-gray-500">النتيجة الحالية: {totalScore} نقاط.</p> */}
         </div>
     );
 };
-
 const TiredTestStep3 = ({ suggestedTasks, restartTest }) => (
     <div className="p-8 bg-white rounded-xl w-full max-w-lg shadow-2xl relative text-center transform transition-all scale-100" dir="rtl">
         <h2 className="text-xl font-bold mb-8 text-gray-800 border-b pb-3">هذه الأهداف المقترحة لك</h2>
@@ -246,9 +267,16 @@ const TiredTestStep3 = ({ suggestedTasks, restartTest }) => (
         <div className="grid grid-cols-2 gap-4">
             {suggestedTasks.length > 0 ? (
                 suggestedTasks.map(task => (
-                    // التأكد من أن حقل task._id موجود قبل الاستخدام
+                    // PASS THE task.type TO THE TaskCard for icon lookup
                     <div key={task._id || JSON.stringify(task)} className="p-4 bg-[#FFF7EC] rounded-xl shadow-lg flex flex-col items-center">
-                        <span className="text-5xl mb-2">{task?.icon || '⭐'}</span>
+                        <div className="w-12 h-12 mb-2 relative">
+                            <Image 
+                                src={TaskIconMap[task.type] || TaskIconMap.default} 
+                                alt={task.title} 
+                                layout="fill" 
+                                objectFit="contain" 
+                            />
+                        </div>
                         <p className="font-bold text-lg text-gray-800">{task.title}</p>
                     </div>
                 ))
@@ -265,36 +293,27 @@ const TiredTestStep3 = ({ suggestedTasks, restartTest }) => (
         </button>
     </div>
 );
-
-
-
-// 3. Next.js Data Fetching (getStaticProps with ISR)
-// This function runs on the server during build and revalidation.
-const DashboardView = ({ advice }) => {
-    // State for the fetched tasks
+const DashboardView = ({ advice, user }) => {
+    // ... (States remain the same) ...
     const [allTasks, setAllTasks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // State for the Tiredness Test Modal
     const [showModal, setShowModal] = useState(false);
     const [testStep, setTestStep] = useState(1);
-    const [headache, setHeadache] = useState(false);
-    const [tirednessLevelScore, setTirednessLevelScore] = useState(null);
-
-    // Fetch tasks from the API on component mount
-
+    const [headache, setHeadache] = useState(null);
+    const [tirednessLevelScore, setTirednessLevelScore] = useState(null); 
+    
     useEffect(() => {
         const fetchTasks = async () => {
-            try {
-                // MAPPING TO: GET /tasks (Read all tasks)
-                const response = await fetch(`${API_BASE_URL}tasks`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                
-                const fetchedTasks = data.data || data; 
 
+            setIsLoading(true);
+            try {
+                // يجب استبدال هذا برمز جلب المهام الفعلي
+                const response = await fetch(`${API_BASE_URL}tasks`);
+                const data = await response.json();
+
+                const fetchedTasks = data.data || data; 
+                // نفترض أن API يرجع مصفوفة من الأهداف (allTasks)
                 if (Array.isArray(fetchedTasks) && fetchedTasks.length > 0) {
                     setAllTasks(fetchedTasks);
                 } else {
@@ -306,24 +325,20 @@ const DashboardView = ({ advice }) => {
                 setIsLoading(false);
             }
         };
-
         fetchTasks();
     }, [allTasks.length]); 
-
-    // Today's suggested tasks for the main dashboard view (Uses fetched data)
-    const todaysTasks = useMemo(() => allTasks.slice(0, 3), [allTasks]);
 
     const closeModal = useCallback(() => {
         setShowModal(false);
         setTestStep(1); 
-        setHeadache(false);
+        setHeadache(null);
         setTirednessLevelScore(null);
     }, []);
 
     const startTest = () => {
         setShowModal(true);
         setTestStep(1);
-        setHeadache(false);
+        setHeadache(null);
         setTirednessLevelScore(null);
     };
 
@@ -334,22 +349,20 @@ const DashboardView = ({ advice }) => {
     const restartTest = () => {
         closeModal();
     }
+    
+    const todaysTasks = useMemo(() => allTasks.slice(0, 3), [allTasks]);
 
-    // Calculate Final Tiredness Score and Suggested Tasks
     const suggestedTasks = useMemo(() => {
-        if (tirednessLevelScore === null) return [];
+        if (tirednessLevelScore === null || headache === null) return [];
         
-        let finalScore = (tirednessLevelScore || 0); // Start from 0 if null
+        let questionnaireScore = (tirednessLevelScore || 0);
         
-        // Add point for headache
-        if (headache) {
-            finalScore += 1;
-        }
+        const headachePoints = headache === true ? 1 : 0; 
         
-        // The final score ranges from 0 (very low fatigue) to 5 (maximum fatigue)
-        finalScore = Math.min(finalScore, 5); 
+        const finalScore = questionnaireScore + headachePoints;
         
-        // 🚨 Passes the fetched 'allTasks' to the suggestion logic
+        console.log(`Final Tiredness Score: ${finalScore}`);
+        
         return getSuggestedTasks(finalScore, allTasks);
 
     }, [tirednessLevelScore, headache, allTasks]);
@@ -361,7 +374,7 @@ const DashboardView = ({ advice }) => {
             case 1:
                 return <TiredTestStep1 setHeadache={setHeadache} nextStep={nextStep} closeModal={closeModal} />;
             case 2:
-                return <TiredTestStep2 setTirednessScore={setTirednessLevelScore} nextStep={nextStep} />;
+                return <TiredTestStep2 setTirednessScore={setTirednessLevelScore} nextStep={nextStep} closeModal={closeModal} />;
             case 3:
                 return <TiredTestStep3 suggestedTasks={suggestedTasks} restartTest={restartTest} />;
             default:
@@ -372,19 +385,11 @@ const DashboardView = ({ advice }) => {
 
     return (
         <div className="text-right">
-            <h2 className="text-3xl font-extrabold text-gray-800 mb-8">أهلاً، أحمد</h2>
+            <h2 className="text-3xl font-extrabold text-gray-800 mb-8">أهلاً، {user?.firstName} {user?.lastName}</h2>
 
-            <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
                 
-                <div className="lg:col-span-1 md:col-span-1 space-y-4">
-                    <div className="bg-white p-4 rounded-xl shadow-lg">
-                        <h3 className="text-lg font-semibold text-gray-700 mb-4">معدل الإنجاز</h3>
-                        <div className="h-44 flex justify-center items-center">
-                            <RadarChart />
-                        </div>
-                    </div>
-                </div>
-                <div className="lg:col-span-2 align-content-center md:col-span-2 space-y-4">
+                <div className="lg:col-span-2 md:col-span-3 align-content-center space-y-4">
                     <div className="p-6 bg-[#374151] text-white rounded-xl shadow-lg">
                         <p className="text-sm font-light mb-1 opacity-75">نصيحة يومية</p>
                         <h3 className="text-xl font-bold">{advice.tip_text}</h3>
@@ -398,9 +403,15 @@ const DashboardView = ({ advice }) => {
                     </div>
                 </div>
                 <div className="lg:col-span-1 md:col-span-3 md:text-center space-y-4">
-                    <div className="p-6 bg-[#EBE0D2] rounded-xl shadow-lg border border-gray-300">
-                        <h3 className="text-xl font-bold text-gray-800 mb-3">أفعل المزيد من الإنجازات</h3>
-                        <p className="text-gray-600 text-sm mb-4">مستعد لإنجاز جديد! هيا قم بإضافة المزيد من الأهداف</p>
+                    <div className="p-6 bg-white rounded-xl shadow-lg border border-gray-300">
+                        <Image 
+                            src={cup_icon}
+                            alt="Cup Icon"
+                            width={50}
+                            height={50}
+                            className="mx-auto mb-4"
+                        />
+                        <p className="text-gray-600 text-sm mb-4">مستعد لإنجاز جديد! هيا قم بإضافة المزيد من المهام</p>
                         <a href="/dashboard/tasks" className="py-2 px-6 bg-indigo-500 text-white text-nowrap font-semibold rounded-lg hover:bg-indigo-600 transition-colors shadow-md">
                             مهمة جديد
                         </a>
@@ -414,9 +425,12 @@ const DashboardView = ({ advice }) => {
                             ) : (
                                 <div className="flex flex-wrap gap-4 justify-start">
                                     {todaysTasks.map(task => (
-                                        <TaskCard key={task._id} title={task.title} icon={task.icon} />
+                                        <TaskCard 
+                                            key={task._id} 
+                                            title={task?.title} 
+                                            taskType={task?.type} // Pass the task type
+                                        />
                                     ))}
-                                    <TaskCard title="" icon="" isPlaceholder={true} /> 
                                 </div>
                             )}
                         </div>
@@ -424,11 +438,11 @@ const DashboardView = ({ advice }) => {
                 <div 
                     className="fixed inset-0 flex items-center justify-center bg-black/30 z-50 p-4"
                     onClick={(e) => { 
-                        // Only close modal if clicking the backdrop AND on the first step
-                        if (e.currentTarget === e.target && testStep === 1) closeModal(); 
+                        // Only close modal if clicking the backdrop AND on step 1 or 2
+                        if (e.currentTarget === e.target && (testStep === 1 || testStep === 2)) closeModal(); 
                     }}
                     onKeyDown={(e) => {
-                        if (e.key === 'Escape' && testStep === 1) closeModal();
+                        if (e.key === 'Escape' && (testStep === 1 || testStep === 2)) closeModal();
                     }}
                     tabIndex={-1}
                 >
@@ -441,32 +455,35 @@ const DashboardView = ({ advice }) => {
 
 
 const Dashboard = () => {
-  function getDailyAdvice() {
-    const now = new Date();
-    
-    // Use Day of Year for a better, year-long cycle
-    const start = new Date(now.getFullYear(), 0, 0); // Start of the year
-    const diff = now - start;
-    const oneDay = 1000 * 60 * 60 * 24;
-    const dayOfYear = Math.floor(diff / oneDay);
+    // get user
+    const { user } = useAuth();
 
-    const dailyTips = advicesData;
-    if (!dailyTips || dailyTips.length === 0) {
-        return { tip_text: "لا توجد نصائح متاحة اليوم.", category: "error" };
+    // Handle generate a new advice everyday
+    function getDailyAdvice() {
+        const now = new Date();
+        
+        // Use Day of Year for a better, year-long cycle
+        const start = new Date(now.getFullYear(), 0, 0); // Start of the year
+        const diff = now - start;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const dayOfYear = Math.floor(diff / oneDay);
+
+        const dailyTips = advicesData;
+        if (!dailyTips || dailyTips.length === 0) {
+            return { tip_text: "لا توجد نصائح متاحة اليوم.", category: "error" };
+        }
+        
+        // The index cycles through the array based on the day of the year
+        const adviceIndex = dayOfYear % dailyTips.length;
+        
+        return dailyTips[adviceIndex];
     }
-    
-    // The index cycles through the array based on the day of the year
-    const adviceIndex = dayOfYear % dailyTips.length;
-    
-    return dailyTips[adviceIndex];
-}
- const revalidate = 60 * 60 * 24; // 86400 seconds (24 hours)
 
-  const dailyAdvice = getDailyAdvice();
+    const dailyAdvice = getDailyAdvice();
     return (
-      <main >
-        <DashboardView advice={dailyAdvice} />
-      </main>
+        <main >
+            <DashboardView advice={dailyAdvice} user={user} />
+        </main>
     );
 };
 

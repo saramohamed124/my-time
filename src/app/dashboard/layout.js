@@ -31,7 +31,7 @@ export default function DashboardLayout({ children }) {
       <Navbar />
       <section className="flex w-full">
         <Sidebar />
-        <main className=" w-full p-6 mx-auto  max-h-screen overflow-y-scroll">
+        <main className=" w-full p-3 md:p-6 mx-auto  max-h-screen overflow-y-scroll">
           {children}
         </main>
       </section>
