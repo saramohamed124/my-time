@@ -513,7 +513,7 @@ const hours = parseInt(taskData.due_date);
             <form onSubmit={editingTask ? handleEditTask : handleAddTask} className="space-y-4">
               {/* Mission Selection */}
               <div>
-                <label htmlFor="mission_id" className="block text-sm font-medium text-gray-700 mb-1">المهمة <span className="text-red-500">*</span></label>
+                <label htmlFor="mission_id" className="block text-sm font-medium text-gray-700 mb-1">الهدف <span className="text-red-500">*</span></label>
                 <select
                   id="mission_id"
                   value={editingTask ? editingTask.mission_id : newTask.mission_id}
@@ -521,7 +521,7 @@ const hours = parseInt(taskData.due_date);
                   className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-shadow"
                   required
                 >
-                  <option value="">اختر المهمة</option>
+                  <option value="">اختر الهدف</option>
                   {missions?.map((mission) => (
                     <option key={mission._id} value={mission._id}>{mission.title}</option>
                   ))}
