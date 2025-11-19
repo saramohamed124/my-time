@@ -91,7 +91,7 @@ export default function Missions() {
         )}
         {error && <div className="text-red-500 col-span-full">{error}</div>}
         {!isLoading && missions.length === 0 ? (
-          <p className='text-xl text-gray-400'>لا توجد أهداف متاحة. أضف هدف جديدة.</p>
+          <p className='text-xl text-gray-400'>لا توجد أهداف متاحة. أضف هدف جديد.</p>
         ) : (
           missions.map((mission) => (
             <MissionCard

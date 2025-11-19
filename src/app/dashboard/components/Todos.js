@@ -11,6 +11,7 @@ import {
   updateTaskStatusAsync,
   fetchMissions
 } from '@/lib/features/todos/todoSlice';
+import Link from 'next/link';
 
 // Hardcoded for consistency, could be fetched from API in a real app
 // --- Status Translations ---
@@ -514,6 +515,9 @@ const hours = parseInt(taskData.due_date);
               {/* Mission Selection */}
               <div>
                 <label htmlFor="mission_id" className="block text-sm font-medium text-gray-700 mb-1">الهدف <span className="text-red-500">*</span></label>
+                {missions?.length === 0 ? (
+                  <p className="text-sm text-gray-500 mb-2">لا توجد أهداف متاحة. <Link className='text-indigo-600 underline' href={'/dashboard/missions'}>الرجاء إنشاء هدف أولاً</Link>.</p>
+                ) : (
                 <select
                   id="mission_id"
                   value={editingTask ? editingTask.mission_id : newTask.mission_id}
@@ -523,9 +527,11 @@ const hours = parseInt(taskData.due_date);
                 >
                   <option value="">اختر الهدف</option>
                   {missions?.map((mission) => (
-                    <option key={mission._id} value={mission._id}>{mission.title}</option>
+                    <option  key={mission._id} value={mission._id}>{mission.title}</option>
                   ))}
                 </select>
+
+                )}
               </div>
 
               {/* Task Title */}
