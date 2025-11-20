@@ -105,13 +105,15 @@ app.post('/auth/signup', async (req, res) => {
         role: 'Student',
         specialty_id: null,
       });
-  
       await newUser.save();
-      res.status(201).json({ message: 'User signed up successfully!', user: newUser });
-    } catch (err) {
-      console.log(err);
+      const userToObject = newUser.toObject();
+      delete userToObject.password;
       
-      console.error('Signup error:', err);
+      res.status(201).json({ message: 'User signed up successfully!', user: userToObject });  
+    } catch (err) {
+      // console.log(err);
+      
+      // console.error('Signup error:', err);
       res.status(500).json({ message: 'Internal Server Error' });
     }
 });
