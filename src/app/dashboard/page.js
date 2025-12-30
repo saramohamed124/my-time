@@ -20,129 +20,158 @@ const TaskIconMap = {
     review: review_icon,
     default: review_icon, // Use review as a fallback or create a generic default icon
 };
+// --- 1. Tiredness Assessment Questions Configuration ---
+// Defines the structure for the tiredness assessment questionnaire.
+// Each object represents a question with an ID, the question text (in Arabic),
+// and a set of options. Each option has a display text and a numerical 'score'
+// which contributes to the final tiredness score.
 const TIREDNESS_QUESTIONS = [
     {
         id: 1,
-        question: 'ما مدى سهولة تشتت انتباهك أو صعوبة تركيزك حالياً؟',
+        question: 'ما مدى سهولة تشتت انتباهك أو صعوبة تركيزك حالياً؟', // "How easily distracted or difficult is it for you to concentrate now?"
         options: [
-            { text: 'لا أواجه صعوب', score: 0 },
-            { text: 'صعوبة بسيطة في التركيز', score: 1 },
-            { text: 'أواجه صعوبة متوسطة في العودة للمهمة', score: 2 },
-            { text: 'أجد صعوبة كبيرة في الحفاظ على التركيز', score: 3 },
-            { text: 'التركيز مستحيل حالياً', score: 4 },
+            { text: 'لا أواجه صعوب', score: 0 }, // "No difficulty"
+            { text: 'صعوبة بسيطة في التركيز', score: 1 }, // "Slight difficulty concentrating"
+            { text: 'أواجه صعوبة متوسطة في العودة للمهمة', score: 2 }, // "Moderate difficulty returning to task"
+            { text: 'أجد صعوبة كبيرة في الحفاظ على التركيز', score: 3 }, // "Great difficulty maintaining concentration"
+            { text: 'التركيز مستحيل حالياً', score: 4 }, // "Concentration is currently impossible"
         ]
     },
     {
         id: 2,
-        question: 'ما هو مستوى الدافع أو الحماس لديك لبدء عمل جديد الآن؟',
+        question: 'ما هو مستوى الدافع أو الحماس لديك لبدء عمل جديد الآن؟', // "What is your level of motivation or enthusiasm to start a new task now?"
         options: [
-            { text: 'حماس ودافع عالي جداً', score: 0 },
-            { text: 'دافع جيد، لكن أحتاج لجهد للبدء', score: 1 },
-            { text: 'دافع متوسط/محايد', score: 2 },
-            { text: 'دافع منخفض جداً', score: 3 },
-            { text: 'لا يوجد دافع على الإطلاق', score: 4 },
+            { text: 'حماس ودافع عالي جداً', score: 0 }, // "Very high enthusiasm and motivation"
+            { text: 'دافع جيد، لكن أحتاج لجهد للبدء', score: 1 }, // "Good motivation, but requires effort to start"
+            { text: 'دافع متوسط/محايد', score: 2 }, // "Moderate/neutral motivation"
+            { text: 'دافع منخفض جداً', score: 3 }, // "Very low motivation"
+            { text: 'لا يوجد دافع على الإطلاق', score: 4 }, // "No motivation at all"
         ]
     },
     {
         id: 3,
-        question: 'كيف تقيّم مستوى الطاقة الجسدية لديك في الوقت الحالي؟',
+        question: 'كيف تقيّم مستوى الطاقة الجسدية لديك في الوقت الحالي؟', // "How do you rate your current physical energy level?"
         options: [
-            { text: 'طاقة عالية ومستعد للتحرك', score: 0 },
-            { text: 'طاقة جيدة، أشعر ببعض الثقل', score: 1 },
-            { text: 'طاقة منخفضة قليلاً وأشعر بالتعب', score: 2 },
-            { text: 'أشعر بالإنهاك الجسدي والرغبة في الاستلقاء', score: 3 },
-            { text: 'إرهاق شديد وعجز عن الحركة', score: 4 },
+            { text: 'طاقة عالية ومستعد للتحرك', score: 0 }, // "High energy, ready to move"
+            { text: 'طاقة جيدة، أشعر ببعض الثقل', score: 1 }, // "Good energy, feel a bit heavy"
+            { text: 'طاقة منخفضة قليلاً وأشعر بالتعب', score: 2 }, // "Slightly low energy, feel tired"
+            { text: 'أشعر بالإنهاك الجسدي والرغبة في الاستلقاء', score: 3 }, // "Feel physically exhausted and want to lie down"
+            { text: 'إرهاق شديد وعجز عن الحركة', score: 4 }, // "Extreme exhaustion and inability to move"
         ]
     }
 ];
 
+// --- 2. API Configuration ---
+// Sets the base URL for API calls, prioritizing the environment variable
+// but defaulting to a local host URL if the variable is not set.
 const API_BASE_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/'}`;
 
+// --- 3. Core Task Suggestion Function ---
+
+/**
+ * Suggests up to 3 tasks based on the user's current tiredness score.
+ * It filters and prioritizes tasks based on defined difficulty and type criteria
+ * corresponding to different tiredness levels.
+ * * @param {number} finalTirednessScore - The total score from the tiredness quiz (e.g., 0-12).
+ * @param {Array<Object>} allTasks - The full list of user's tasks.
+ * @returns {Array<Object>} - A list of up to 3 suggested tasks.
+ */
 const getSuggestedTasks = (finalTirednessScore, allTasks) => {
+    // Input validation: Check if the task list is valid and not empty.
     if (!allTasks || allTasks.length === 0) {
         console.log("Error: Task list is empty or invalid.");
         return [];
     }
 
+    // Maximum possible tiredness score (4 points/question * 3 questions = 12, but using 13 for safety margin)
     const MAX_SCORE = 13;
-const TIREDNESS_LEVELS_GENERAL = [ 
-    { 
-        score_max: 2, 
-        difficulty: ['hard', 'intermediate'], 
-        types: ['study', 'review', 'soft_skills'] 
-    }, // تعب منخفض (0-2) - يركز على العمل الجاد
-    { 
-        score_max: 6, 
-        difficulty: ['intermediate', 'easy'], 
-        types: ['soft_skills', 'physical', 'study','other'] 
-    }, // تعب متوسط (3-6) - مزيج متوازن
-    { 
-        score_max: MAX_SCORE, 
-        difficulty: ['easy'], 
-        types: ['mental_break', 'physical', 'soft_skills'] // تعب عالي (7-13) - نفضل الاستراحة أولاً
-    } 
-];
+    
+    // Configuration for mapping tiredness scores to suggested task properties (Difficulty and Type).
+    // The comments explain the logic:
+    const TIREDNESS_LEVELS_GENERAL = [ 
+        { 
+            score_max: 2, // Low Tiredness (0-2)
+            difficulty: ['hard', 'intermediate'], // Focus on hard work
+            types: ['study', 'review', 'soft_skills'] 
+        }, 
+        { 
+            score_max: 6, // Medium Tiredness (3-6)
+            difficulty: ['intermediate', 'easy'], // Balanced mix
+            types: ['soft_skills', 'physical', 'study','other'] 
+        }, 
+        { 
+            score_max: MAX_SCORE, // High Tiredness (7-13)
+            difficulty: ['easy'], // Prioritize rest/easy tasks
+            types: ['mental_break', 'physical', 'soft_skills'] 
+        } 
+    ];
+    
     let requiredDifficulty = [];
     let preferredTypes = [];
 
-    // 1. تحديد مستوى التعب والصعوبة والأنواع المفضلة
+    // 1. Determine Tiredness Level, Required Difficulty, and Preferred Types
+    // Iterate through levels to find the one matching the score.
     for (const level of TIREDNESS_LEVELS_GENERAL) {
         if (finalTirednessScore <= level.score_max) {
             requiredDifficulty = level.difficulty;
             preferredTypes = level.types;
-            break;
+            break; // Stop once the correct level is found
         }
     }
     
-    // المهام التي لم تُنجز بعد
+    // Filter out tasks that are already completed.
     const activeTasks = allTasks.filter(task => task.status !== 'completed');
     const suggestions = [];
     
-    // --- 2. بناء مجموعات الترشيح بترتيب الأولوية ---
+    // --- 2. Building the Task Filtering Groups by Priority ---
     
-    // أ. المجموعة الأولى: مطابقة مزدوجة (صعوبة + نوع) - الأولوية القصوى
+    // A. Group A: Dual Match (Difficulty + Type) - Highest Priority
+    // Tasks matching BOTH the required difficulty and a preferred type.
     const groupA = activeTasks.filter(task =>
         requiredDifficulty.includes(task.difficulty_level) &&
         preferredTypes.includes(task.type)
     );
     
-    // ب. المجموعة الثانية: مطابقة النوع فقط - لضمان التنويع
+    // B. Group B: Type Match Only - To ensure variety of preferred activities
+    // Tasks matching the preferred type, excluding those already selected in Group A.
     const groupB = activeTasks.filter(task =>
         preferredTypes.includes(task.type) &&
-        !suggestions.some(s => s._id === task._id) // تجنب المهام التي تم اختيارها
+        !groupA.some(s => s._id === task._id) // Avoid tasks already in Group A
     );
 
-    // ج. المجموعة الثالثة: مطابقة الصعوبة فقط - لضمان الاستمرارية بمستوى الإرهاق
+    // C. Group C: Difficulty Match Only - To ensure continued activity at the right exertion level
+    // Tasks matching the required difficulty, excluding those already selected in Groups A and B.
     const groupC = activeTasks.filter(task =>
         requiredDifficulty.includes(task.difficulty_level) &&
-        !suggestions.some(s => s._id === task._id) // تجنب المهام التي تم اختيارها
+        !groupA.some(s => s._id === task._id) && // Avoid tasks already in Group A
+        !groupB.some(s => s._id === task._id)  // Avoid tasks already in Group B (only unique from A)
     );
     
-    // --- 3. تجميع المهام المقترحة حتى 3 ---
+    // --- 3. Assembling the Suggested Tasks (Max 3) ---
     
-    // إضافة من المجموعة أ (مطابقة مزدوجة)
+    // Add up to 3 tasks from Group A (Best match)
     suggestions.push(...groupA.slice(0, 3));
     
-    // إضافة من المجموعة ب (مطابقة النوع) لملء المقترحات
+    // Fill remaining slots from Group B (Type match)
     if (suggestions.length < 3) {
+        // Filter Group B tasks that are not already in suggestions
         const uniqueGroupB = groupB.filter(task => !suggestions.some(s => s._id === task._id));
         suggestions.push(...uniqueGroupB.slice(0, 3 - suggestions.length));
     }
     
-    // إضافة من المجموعة ج (مطابقة الصعوبة) لملء المقترحات
+    // Fill remaining slots from Group C (Difficulty match)
     if (suggestions.length < 3) {
+        // Filter Group C tasks that are not already in suggestions
         const uniqueGroupC = groupC.filter(task => !suggestions.some(s => s._id === task._id));
         suggestions.push(...uniqueGroupC.slice(0, 3 - suggestions.length));
     }
     
-    // إرجاع أول 3 مهام فريدة
-    // (يتم التعامل مع الفرادة في الخطوات السابقة، لكن للتأكد)
+    // Return the final list, ensuring uniqueness and limiting to 3 (redundant check for safety).
     const uniqueSuggestions = Array.from(new Set(suggestions.map(s => s._id)))
         .map(_id => suggestions.find(s => s._id === _id));
 
     return uniqueSuggestions.slice(0, 3);
-};
-// --- Shared Components (RadarChart, TaskCard, MissionsCard) ---
+};// --- Shared Components (RadarChart, TaskCard, MissionsCard) ---
 
 const TaskCard = ({ title, icon, taskType, isPlaceholder = false }) => {
     const imageSource = TaskIconMap[taskType] || TaskIconMap.default;

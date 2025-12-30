@@ -8,6 +8,15 @@ import { AuthProvider, useAuth } from '@/app/context/AuthContext'
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+export const metadata = {
+  title: "My-Time",
+  description: "Task management app to boost your productivity.",
+  icons: {
+    icon: '/favicon.png',
+    sizes: ['16x16', '32x32', '48x48'],
+  },
+};
+
 const robotoSans = Roboto({
   variable: "--font-roboto-sans",
   subsets: ["latin"],
@@ -19,17 +28,6 @@ const robotoMono = Roboto_Mono({
 });
 
 export default function RootLayout({ children }) {
-  const router = useRouter();
-  // const { user, loading } = useAuth();
-  // useEffect(() => {
-  //   // Redirect to login if user is not authenticated
-  //   if (!loading && !user) {
-  //     router.push('/login');
-  //   }else if (user && router.pathname === '/login') {
-  //     router.push('/dashboard'); // Redirect to dashboard if user is authenticated and on login page
-  //   }
-  // }, [user, loading, router]);
-
   return (
     <Provider store={store}>  {/* Wrap the entire app with Redux provider */}
     <html lang="ar" dir="rtl">

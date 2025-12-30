@@ -11,10 +11,6 @@ const TaskSchema = new Schema({
         type: String,
         trim: true,
     },
-    due_date:{
-        type: Date,
-        required:true,
-    },
     difficulty_level:{
         type: String,
         enum: ['easy', 'intermediate', 'hard'],
